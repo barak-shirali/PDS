@@ -46,7 +46,8 @@
     "underscore": "latest",
     "validator": "^3.39.0",
     "view-helpers": "latest",
-    "winston": "latest"
+    "winston": "latest",
+    "coffee-script": "~1.6.3"
   },
   "devDependencies": {
     "supertest": "latest",
