@@ -1,0 +1,10 @@
+<div class="ui-bundle-preview-container" ng-class="class">
+<center>
+	<div class="photo margin-top-15">
+		<img ng-src="{{bundle.photo}}" />
+		<div class="ui-bundle-preview-label"></div>
+	</div>
+	<svg id="circle" ng-click="callback(bundle)"><path fill="none" stroke="#ffffff" stroke-width="0" /></svg>
+	<div class="name margin-top-15" ng-click="callback(bundle)">{{bundle.bundleName}}</div>
+</center>
+</div>

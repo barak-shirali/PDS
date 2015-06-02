@@ -1,0 +1,22 @@
+{
+  apps : [
+    {
+      name      : "Remit System",
+      script    : "/usr/local/bin/grunt",
+      env_production : {
+        NODE_ENV: "production"
+      }
+    }
+  ],
+  deploy : {
+    production : {
+      key  : "/home/andriy/.ssh/package.pem",
+      user : "ubuntu",
+      host : "52.5.145.69",
+      ref  : "origin/master",
+      repo : "https://github.com/barak-shirali/PDS.git",
+      path : "/srv/production",
+      "post-deploy" : "sudo npm install && sudo bower install --allow-root && sudo pm2 startOrRestart ecosystem.json5 --env production"
+    }
+  }
+}
