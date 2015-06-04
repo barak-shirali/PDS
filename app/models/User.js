@@ -41,6 +41,10 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.STRING,
 				defaultValue: ""
 			},
+			phone: {
+				type: DataTypes.STRING,
+				defaultValue: ""
+			},
 			onlineStatus: {
 				type: DataTypes.ENUM('ONLINE', 'BUSY', 'AWAY', 'OFFLINE'),
 				defaultValue: 'OFFLINE'
@@ -112,6 +116,7 @@ module.exports = function(sequelize, DataTypes) {
 						latitude: this.latitude,
 						longitude: this.longitude,
 						address: this.address,
+						phone: this.phone,
 						onlineStatus: this.onlineStatus,
 						photo: this.photo,
 						createdAt: this.createdAt,
@@ -122,8 +127,8 @@ module.exports = function(sequelize, DataTypes) {
 			associate: function(models) {
 				User.hasMany(models.UserDevice);
 				User.hasMany(models.UserSession);
-				User.hasMany(models.Order, { as: 'SRSOrder', foreignKey: 'srs_id'});
-				User.hasMany(models.Order, { as: 'DriverOrder', foreignKey: 'driver_id'});
+				User.hasMany(models.Order, { as: 'SRSOrders', foreignKey: 'srs_id'});
+				User.hasMany(models.Order, { as: 'DriverOrders', foreignKey: 'driver_id'});
 				User.hasMany(models.Review);
 			}
 		}

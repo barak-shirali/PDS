@@ -134,6 +134,7 @@ exports.update = function(req, res) {
   req.user.lastname = req.body.lastname;
   req.user.address = req.body.address;
   req.user.photo = req.body.photo;
+  req.user.phone = req.body.phone;
   if(req.body.password) {
     req.user.salt = req.user.makeSalt();
     req.user.hashedPassword = req.user.encryptPassword(req.body.password, req.user.salt);

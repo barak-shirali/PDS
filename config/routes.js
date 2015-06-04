@@ -1,4 +1,5 @@
 var users       = require('../app/controllers/users');
+var orders      = require('../app/controllers/orders');
 var index       = require('../app/controllers/index');
 
 exports.init = function(app, passport, auth) {
@@ -32,12 +33,15 @@ exports.init = function(app, passport, auth) {
     app.param('userId', users.user);
 
     // Order Routes
-    // app.get     ('/api/orders', auth.requiresLogin, orders.all);
-    // app.post    ('/api/orders', auth.requiresLogin, auth.requiresLogin, orders.create);
-    // app.get     ('/api/orders/:bundleId', auth.requiresLogin, orders.show);
-    // app.put     ('/api/orders/:bundleId', auth.requiresLogin, orders.update);
-    // app.del     ('/api/orders/:bundleId', auth.requiresLogin, orders.destroy);
-    // app.param('bundleId', orders.bundle);
+    app.get     ('/api/orders', auth.requiresLogin, orders.all);
+    app.post    ('/api/orders', auth.requiresLogin, auth.requiresLogin, auth.isSRS, orders.create);
+    app.get     ('/api/orders/:orderId', auth.requiresLogin, orders.show);
+    app.put     ('/api/orders/:orderId', auth.requiresLogin, orders.update);
+    app.del     ('/api/orders/:orderId', auth.requiresLogin, auth.isSRS, orders.destroy);
+    app.post    ('/api/orders/:orderId/request', auth.requiresLogin, auth.isSRS, orders.requestDriver);
+    app.post    ('/api/orders/:orderId/accept', auth.requiresLogin, auth.isDriver, orders.acceptOrder);
+    app.post    ('/api/orders/:orderId/deny', auth.requiresLogin, auth.isDriver, orders.denyOrder);
+    app.param   ('orderId', orders.order);
 
     // Home route
     app.get('/', index.render);

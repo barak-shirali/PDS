@@ -27,7 +27,7 @@ exports.user = {
 };
 
 exports.isSRS = function(req, res, next) {
-    if (req.user === null || typeof req.user === "undefined" || req.user.type != 2) {
+    if (req.user === null || typeof req.user === "undefined" || (req.user.type != 'SRS' && req.user.type != 'ADMIN') ) {
         return res.status(401).send({
             error: 'User is not authorized',
             code: 'UNAUTHORIZED'
@@ -36,7 +36,7 @@ exports.isSRS = function(req, res, next) {
     next();
 };
 exports.isDriver = function(req, res, next) {
-    if (req.user === null || typeof req.user === "undefined" || req.user.type != 3) {
+    if (req.user === null || typeof req.user === "undefined"|| (req.user.type != 'DRIVER' && req.user.type != 'ADMIN')) {
         return res.status(401).send({
             error: 'User is not authorized',
             code: 'UNAUTHORIZED'
