@@ -26,5 +26,8 @@ module.exports = {
         port: 587,
         username: 'gareth@webfire.co.uk',
         password: 'bqH_kGZC5NDrXjHrrFBEdw'
+    },
+    google: {
+        API_KEY: 'AIzaSyBwA0gK6rlIDK4VqhvTxkJn-OU_XMV_dII'
     }
 }
