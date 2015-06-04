@@ -36,11 +36,17 @@ exports.init = function(app, passport, auth) {
     app.get     ('/api/orders', auth.requiresLogin, orders.all);
     app.post    ('/api/orders', auth.requiresLogin, auth.requiresLogin, auth.isSRS, orders.create);
     app.get     ('/api/orders/:orderId', auth.requiresLogin, orders.show);
-    app.put     ('/api/orders/:orderId', auth.requiresLogin, orders.update);
+    // app.put     ('/api/orders/:orderId', auth.requiresLogin, orders.update);
     app.del     ('/api/orders/:orderId', auth.requiresLogin, auth.isSRS, orders.destroy);
     app.post    ('/api/orders/:orderId/request', auth.requiresLogin, auth.isSRS, orders.requestDriver);
     app.post    ('/api/orders/:orderId/accept', auth.requiresLogin, auth.isDriver, orders.acceptOrder);
     app.post    ('/api/orders/:orderId/deny', auth.requiresLogin, auth.isDriver, orders.denyOrder);
+    app.post    ('/api/orders/:orderId/cancel', auth.requiresLogin, auth.isDriver, orders.cancelOrder);
+    app.post    ('/api/orders/:orderId/pickup', auth.requiresLogin, orders.pickupOrder);
+    app.post    ('/api/orders/:orderId/2minaway', auth.requiresLogin, auth.isDriver, orders.almostThereOrder);
+    app.post    ('/api/orders/:orderId/dropoff', auth.requiresLogin, auth.isDriver, orders.dropoffOrder);
+    app.post    ('/api/orders/:orderId/complete', auth.requiresLogin, auth.isSRS, orders.completeOrder);
+    app.post    ('/api/orders/:orderId/review', auth.requiresLogin, auth.isSRS, orders.reviewDriver);
     app.param   ('orderId', orders.order);
 
     // Home route

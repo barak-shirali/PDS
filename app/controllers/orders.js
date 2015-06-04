@@ -293,7 +293,8 @@ exports.all = function(req, res) {
         console.log(err);
         return res.status(400).send({
             error: "Unexpected error.",
-            code: "UNEXPECTED_ERROR"
+            code: "UNEXPECTED_ERROR",
+            orders: []
         });
     });
 };
@@ -408,6 +409,214 @@ exports.denyOrder = function(req, res) {
                     error: ''
                 });
             });     
+        }).error(function(err){
+            return res.status(400).send({
+                error: "Unexpected error.",
+                code: "UNEXPECTED_ERROR"
+            });
+        });
+};
+
+exports.reviewDriver = function(req, res) {
+    if(req.order === null) {
+        return res.status(400).send({
+            error: 'Order not found.', 
+            code: 'INVALID_ORDER_ID'
+        });
+    }
+    if(req.order.status != 'COMPLETED') {
+        return res.status(400).send({
+            error: 'You can write review on this order.', 
+            code: 'INVALID_ORDER_ID'
+        });
+    }
+    if( !req.body.rating || req.body.rating < 0 || req.body.rating > 5) {
+        return res.status(400).send({
+            error: 'Please provide rating between 0 to 5.', 
+            code: 'INVALID_RATING'
+        });
+    }
+    if( !req.body.comment || req.body.comment === "") {
+        return res.status(400).send({
+            error: 'Please provide comment.', 
+            code: 'EMPTY_COMMENT'
+        });
+    }
+
+    db.Review.find({where: {UserId: req.order.driver_id, OrderId: req.order.id}})
+        .success(function(review) {
+            if(review) {
+                return res.status(400).send({
+                    error: 'You have already written review on this order.', 
+                    code: 'DUPLICATED_REVIEW'
+                });
+            }
+            else {
+                db.Review.create({
+                    UserId: req.order.driver_id,
+                    OrderId: req.order.id,
+                    rating: req.body.rating,
+                    comment: req.body.comment
+                }).success(function(review) {
+                    return res.status(400).send({
+                        error: "",
+                        code: "OK"
+                    });
+                }).error(function(err){
+                    return res.status(400).send({
+                        error: "Unexpected error.",
+                        code: "UNEXPECTED_ERROR"
+                    });
+                });
+            }
+        }).error(function(err){
+            return res.status(400).send({
+                error: "Unexpected error.",
+                code: "UNEXPECTED_ERROR"
+            });
+        });
+};
+
+
+exports.cancelOrder = function(req, res) {
+    if(req.order === null || req.order.driver_id != req.user.id) {
+        return res.status(400).send({
+            error: 'Order not found.', 
+            code: 'INVALID_ORDER_ID'
+        });
+    }
+
+    req.order.driver_id = null;
+    req.order.status = 'PENDING';
+
+    var list = JSON.parse(req.order.driverCheckList);
+    list.push(req.user.id);
+    req.order.driverCheckList = JSON.stringify(list);
+
+    req.order.save()
+        .success(function(review) {
+            notification.sendNotification(req.order.srs_id, {
+                type: 'ORDER_CANCELED',
+                message: req.user.firstname + ' ' + req.user.lastname + ' has canceled the delivery.',
+                data: {
+                    orderId: req.order.id,
+                    driverId: req.user.id
+                }
+            }, function() {
+                return res.jsonp({
+                    code: 'OK',
+                    error: ''
+                });
+            });  
+        }).error(function(err){
+            return res.status(400).send({
+                error: "Unexpected error.",
+                code: "UNEXPECTED_ERROR"
+            });
+        });
+};
+exports.pickupOrder = function(req, res) {
+    if(req.order === null || req.order.status != 'ACCEPTED' || req.order.driver_id != req.user.id) {
+        return res.status(400).send({
+            error: 'Order not found.', 
+            code: 'INVALID_ORDER_ID'
+        });
+    }
+
+    req.order.status = 'PICKED';
+
+    req.order.save()
+        .success(function(review) {
+            notification.sendNotification(req.order.srs_id, {
+                type: 'ORDER_PICKEDUP',
+                message: req.user.firstname + ' ' + req.user.lastname + ' has picked up your order.',
+                data: {
+                    orderId: req.order.id,
+                    driverId: req.user.id
+                }
+            }, function() {
+                return res.jsonp({
+                    code: 'OK',
+                    error: ''
+                });
+            });  
+        }).error(function(err){
+            return res.status(400).send({
+                error: "Unexpected error.",
+                code: "UNEXPECTED_ERROR"
+            });
+        });
+};
+exports.almostThereOrder = function(req, res) {
+    if(req.order === null || req.order.status != 'PICKED' || req.order.driver_id != req.user.id) {
+        return res.status(400).send({
+            error: 'Order not found.', 
+            code: 'INVALID_ORDER_ID'
+        });
+    }
+
+    notification.sendNotification(req.order.srs_id, {
+        type: 'ORDER_2MIN_AWAY',
+        message: 'Your order has almost delivered. Just 2 mins away.',
+        data: {
+            orderId: req.order.id,
+            driverId: req.user.id
+        }
+    }, function() {
+        return res.jsonp({
+            code: 'OK',
+            error: ''
+        });
+    });  
+};
+
+exports.dropoffOrder = function(req, res) {
+    if(req.order === null || req.order.status != 'PICKED' || req.order.driver_id != req.user.id) {
+        return res.status(400).send({
+            error: 'Order not found.', 
+            code: 'INVALID_ORDER_ID'
+        });
+    }
+
+    req.order.save()
+        .success(function(review) {
+            notification.sendNotification(req.order.srs_id, {
+                type: 'ORDER_DROPPEDOFF',
+                message: req.user.firstname + ' ' + req.user.lastname + ' has dropped off your order.',
+                data: {
+                    orderId: req.order.id,
+                    driverId: req.user.id
+                }
+            }, function() {
+                return res.jsonp({
+                    code: 'OK',
+                    error: ''
+                });
+            });  
+        }).error(function(err){
+            return res.status(400).send({
+                error: "Unexpected error.",
+                code: "UNEXPECTED_ERROR"
+            });
+        });
+};
+
+
+exports.completeOrder = function(req, res) {
+    if(req.order === null || req.order.status != 'PICKED' || req.order.driver_id != req.user.id) {
+        return res.status(400).send({
+            error: 'Order not found.', 
+            code: 'INVALID_ORDER_ID'
+        });
+    }
+    
+    req.order.status = 'COMPLETED';
+    req.order.save()
+        .success(function(review) {
+            return res.jsonp({
+                code: 'OK',
+                error: ''
+            });
         }).error(function(err){
             return res.status(400).send({
                 error: "Unexpected error.",
