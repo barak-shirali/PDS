@@ -29,7 +29,7 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
   },
   function(email, password, done) {
-    db.User.find({ where: { email: email }}).success(function(user) {
+    db.User.find({ where: { email: email, status: 1 }}).success(function(user) {
       if (!user) {
         done(null, false, { message: 'Unknown user' });
       } 
@@ -40,10 +40,11 @@ passport.use(new LocalStrategy({
         done(null, false, { message: 'Invalid password'});
       } else {
         console.log('Login (local) : { id: ' + user.id + ', email: ' + user.email + ' }');
+        db.UserSession.createSession(user.id);
         done(null, user);
       }
     }).error(function(err){
-      done(err);
+      done(null, false, { message: 'Unexpected error'});
     });
   }
 ));

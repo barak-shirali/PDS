@@ -20,8 +20,8 @@ module.exports = function(sequelize, DataTypes) {
 				defaultValue: ""
 			},
 			paymentType: {
-				type: DataTypes.INTEGER,
-				defaultValue: 0
+				type: DataTypes.ENUM('CASH', 'CREDIT_CARD'),
+				defaultValue: 'CASH'
 			},
 			paymentAmount: {
 				type: DataTypes.FLOAT,
@@ -49,8 +49,8 @@ module.exports = function(sequelize, DataTypes) {
 			},
 			comment: DataTypes.TEXT,
 			status: {
-				type: DataTypes.INTEGER,
-				defaultValue: 0
+				type: DataTypes.ENUM('DRAFTED', 'PENDING', 'ACCEPTED', 'PICKED', 'COMPLETED', 'CANCELED'),
+				defaultValue: 'DRAFTED'
 			},
 			driverCheckList: DataTypes.TEXT
 		},

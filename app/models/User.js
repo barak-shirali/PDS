@@ -4,6 +4,7 @@
 	*/
 
 var crypto = require('crypto');
+var _ = require('lodash');
 
 module.exports = function(sequelize, DataTypes) {
 
@@ -25,8 +26,8 @@ module.exports = function(sequelize, DataTypes) {
 				defaultValue: ""
 			},
 			type: {
-				type: DataTypes.INTEGER,
-				defaultValue: 3
+				type: DataTypes.ENUM('ADMIN', 'SRS', 'DRIVER'),
+				defaultValue: 'DRIVER'
 			},
 			latitude: {
 				type: DataTypes.FLOAT,
@@ -41,8 +42,8 @@ module.exports = function(sequelize, DataTypes) {
 				defaultValue: ""
 			},
 			onlineStatus: {
-				type: DataTypes.INTEGER,
-				defaultValue: 0
+				type: DataTypes.ENUM('ONLINE', 'BUSY', 'AWAY', 'OFFLINE'),
+				defaultValue: 'OFFLINE'
 			},
 			hashedPassword: {
 				type: DataTypes.STRING,
@@ -69,16 +70,16 @@ module.exports = function(sequelize, DataTypes) {
 				defaultValue: null
 			},
 			status: {
-				type: DataTypes.INTEGER,
-				defaultValue: 0
+				type: DataTypes.ENUM('UNVERIFIED', 'ACTIVE', 'DELETED', 'BLOCKED'),
+				defaultValue: 'UNVERIFIED'
 			}
 		},
 		{ 
 			scopes: {
 				all: { where: { } },
-				deleted: { where: { "User.status": 2 } },
-				not_deleted: { where: { "User.status": { ne: 2 } } },
-				active: { where: { "User.status": 1 } },
+				deleted: { where: { "User.status": 'DELETED' } },
+				not_deleted: { where: { "User.status": { ne: 'DELETED' } } },
+				active: { where: { "User.status": 'ACTIVE' } },
 				any: function(status) {
 					return {
 						where: {
@@ -86,8 +87,8 @@ module.exports = function(sequelize, DataTypes) {
 						}
 					};
 				},
-				drivers: { where: { "User.type" : 3 } },
-				SRSs: { where: { "User.type" : 2 } }
+				drivers: { where: { "User.type" : 'DRIVER' } },
+				SRSs: { where: { "User.type" : 'SRS' } }
 			},
 			instanceMethods: {
 				makeSalt: function() {
@@ -100,6 +101,22 @@ module.exports = function(sequelize, DataTypes) {
 					if (!password || !salt) return '';
 					salt = new Buffer(salt, 'base64');
 					return crypto.pbkdf2Sync(password, salt, 10000, 64).toString('base64');
+				},
+				json: function() {
+					return {
+						id: this.id,
+						firstname: this.firstname,
+						lastname: this.lastname,
+						email: this.email,
+						type: this.type,
+						latitude: this.latitude,
+						longitude: this.longitude,
+						address: this.address,
+						onlineStatus: this.onlineStatus,
+						photo: this.photo,
+						createdAt: this.createdAt,
+						updatedAt: this.updatedAt
+					};
 				}
 			},
 			associate: function(models) {
