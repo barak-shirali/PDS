@@ -5,8 +5,9 @@ var express = require('express');
 var flash = require('connect-flash');
 var helpers = require('view-helpers');
 var config = require('./config');
+var users       = require('../app/controllers/users');
 
-module.exports = function(app, passport) {
+module.exports = function(app) {
 
     console.log('Initializing Express');
 
@@ -57,9 +58,8 @@ module.exports = function(app, passport) {
         //dynamic helpers
         app.use(helpers(config.app.name));
 
-        //use passport session
-        app.use(passport.initialize());
-        app.use(passport.session());
+        //parse header
+        app.use(users.session);
 
         //routes should be at the last
         app.use(app.router);
