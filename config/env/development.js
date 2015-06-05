@@ -13,14 +13,6 @@ module.exports = {
         admin_email: "barak.shiralii@gmail.com",
         admin_name: "Remitsystem.com Support"
     },
-    facebook: {
-        clientID: "714935035319726",
-        clientSecret: "3d4a9c12c4f14fe06ebd76e481cf800c",
-        callbackURL: "http://localhost:3000/auth/facebook/callback"
-    },
-    filepicker: {
-        api_key: "AAIOY2BF3R3qjcrvz9lxXz"
-    },
     smtp: {
         host: 'smtp.mandrillapp.com',
         port: 587,
@@ -28,6 +20,6 @@ module.exports = {
         password: 'bqH_kGZC5NDrXjHrrFBEdw'
     },
     google: {
-        API_KEY: 'AIzaSyBwA0gK6rlIDK4VqhvTxkJn-OU_XMV_dII'
+        API_KEY: 'AIzaSyDjzdw2V0hOYrLVhO2VBZscOewuufMlzKo'
     }
 }
