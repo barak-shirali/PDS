@@ -205,6 +205,18 @@ exports.updateLocation = function(req, res) {
     });
 };
 
+
+exports.getLocation = function(req, res) {
+  return res.send({
+    error: "",
+    code: "",
+    location: {
+      latitude: req.profile.latitude,
+      longitude: req.profile.longitude
+    }
+  });
+};
+
 /**
  * Forget password
  */

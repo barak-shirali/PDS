@@ -25,7 +25,9 @@ exports.init = function(app, passport, auth) {
     // app.post    ('/api/users', users.create);
     app.put     ('/api/users', auth.requiresLogin, users.update);
     app.post    ('/api/users/location', auth.requiresLogin, users.updateLocation);
+    app.get     ('/api/users/:userId/location', auth.requiresLogin, auth.isSRS, users.getLocation);
     app.post    ('/api/users/status', auth.requiresLogin, users.updateStatus);
+
 
     // app.get     ('/api/users/auth/failed', users.failed);
 
