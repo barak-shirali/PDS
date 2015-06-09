@@ -113,6 +113,12 @@ exports.create = function(req, res) {
             code: 'EMPTY_DROPOFF_NAME'
         });
     }
+    if(!req.body.dropoffPhone) {
+        return res.status(400).send({ 
+            error: 'Please provide customer phone number.',
+            code: 'EMPTY_DROPOFF_PHONE'
+        });
+    }
 
     req.body.srs_id = req.user.id;
     req.body.driver_id = null;

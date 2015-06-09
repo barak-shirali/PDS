@@ -47,6 +47,10 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.STRING,
 				defaultValue: ""
 			},
+			dropoffPhone: {
+				type: DataTypes.STRING,
+				defaultValue: ""
+			},
 			comment: DataTypes.TEXT,
 			status: {
 				type: DataTypes.ENUM('DRAFTED', 'PENDING', 'ACCEPTED', 'PICKED', 'COMPLETED', 'CANCELED'),
