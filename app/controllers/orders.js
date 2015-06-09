@@ -139,7 +139,7 @@ exports.create = function(req, res) {
                         code: 'OK',
                         error: '',
                         drivers: drivers,
-                        order: order.json()
+                        order: order
                     });
                 });    
             });
