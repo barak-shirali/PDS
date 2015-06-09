@@ -21,5 +21,10 @@ module.exports = {
     },
     google: {
         API_KEY: 'AIzaSyDjzdw2V0hOYrLVhO2VBZscOewuufMlzKo'
+    },
+    twilio: {
+        ACCOUNT_SID: 'AC987259e44d052a853d82b8b1ad789b95',
+        AUTH_KEY: '8da6da829c50069bc4912684e2ca6dca',
+        NUMBER: '+14152315532'
     }
 }

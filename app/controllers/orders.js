@@ -5,6 +5,7 @@ var db = require('../../config/sequelize');
 var _ = require('lodash');
 var async = require('async');
 var notification = require('../lib/notification');
+var twilio = require('../../config/twilio');
 
 /**
  * Find order by id
@@ -57,7 +58,7 @@ exports.create = function(req, res) {
         return res.status(400).send({ 
             error: 'Please provide pickup latitude.',
             code: 'EMPTY_PICKUP_LATITUDE'
-        });
+        }); 
     }
     if(!req.body.pickupLongitude) {
         return res.status(400).send({ 
@@ -569,9 +570,15 @@ exports.almostThereOrder = function(req, res) {
             driverId: req.user.id
         }
     }, function() {
-        return res.jsonp({
-            code: 'OK',
-            error: ''
+
+        twilio.sendMessage({
+            to: req.order.srs_id,
+            body: 'Your order has almost delivered. Just 2 mins away.'
+        }, function(err, responseData) {
+            return res.jsonp({
+                code: 'OK',
+                error: ''
+            });
         });
     });  
 };

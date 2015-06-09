@@ -53,6 +53,7 @@
     "passport-twitter": "1.0.2",
     "sequelize-mysql": "latest",
     "sequelize-sqlite": "1.7.0",
+    "twilio": "^2.2.1",
     "underscore": "latest",
     "validator": "^3.39.0",
     "view-helpers": "latest",
