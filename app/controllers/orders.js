@@ -6,6 +6,7 @@ var _ = require('lodash');
 var async = require('async');
 var notification = require('../lib/notification');
 var twilio = require('../../config/twilio');
+var orderman = require('../lib/orderman');
 
 /**
  * Find order by id
@@ -16,33 +17,22 @@ exports.order = function(req, res, next, id) {
     console.log('id => ' + id);
     db.Order.find({ where: {id: id} }).success(function(order){
         if(!order) {
-            return next(new Error('Failed to load order ' + id));
+            return res.status(400).send({
+                error: 'order not found.', 
+                code: 'INVALID_ORDER_ID'
+            });
         } else {
             req.order = order;
             return next();            
         }
     }).error(function(err){
-        return next(err);
+        return res.status(400).send({
+            error: 'order not found.', 
+            code: 'INVALID_ORDER_ID'
+        });
     });
 };
 
-var getNearestDrivers = function(latitude, longitude, denied_drivers, count, next) {
-    denied_drivers.push(0);
-    db.sequelize.query('SELECT *, haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) as distance, (select avg(rating) FROM Reviews Where Reviews.UserId = Users.id) as rating FROM Users WHERE Users.id NOT IN ' + '(' + denied_drivers.join() + ')' + ' AND Users.status = "ACTIVE" and Users.type = "DRIVER" ORDER BY haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) ASC LIMIT 0, ' + count, db.User)
-        .then(function(users) {
-            _.each(users, function(user) {
-                var distance = user.distance;
-                var rating = user.rating;
-                user = user.json();
-                user.distance = distance;
-                user.rating = rating;
-            });
-            next(users);
-        }, function(err) {
-            console.log(err);
-            next([]);
-        });
-};
 /**
  * Create a order
  */
@@ -133,16 +123,16 @@ exports.create = function(req, res) {
                 code: "UNEXPECTED_ERROR"
             });
         } else {
-            getNearestDrivers(order.pickupLatitude, order.pickupLongitude, [], 10, function(drivers) {
-                order.json(function(order) {
-                    return res.jsonp({
-                        code: 'OK',
-                        error: '',
-                        drivers: drivers,
-                        order: order
-                    });
-                });    
-            });
+
+            orderman.startFindDriver(order);
+
+            order.json(function(order) {
+                return res.jsonp({
+                    code: 'OK',
+                    error: '',
+                    order: order
+                });
+            });   
         }
     }).error(function(err){
         console.log(err);
@@ -237,18 +227,13 @@ exports.show = function(req, res) {
     }
 
     if(req.order.status == 'PENDING') {
-        var denied_drivers = JSON.parse(req.order.driverCheckList);
-
-        getNearestDrivers(req.order.pickupLatitude, req.order.pickupLongitude, denied_drivers, 10, function(drivers) {
-            req.order.json(function(order) {
-                return res.jsonp({
-                    code: 'OK',
-                    error: '',
-                    drivers: drivers,
-                    order: order
-                });
-            });    
-        });
+        req.order.json(function(order) {
+            return res.jsonp({
+                code: 'OK',
+                error: '',
+                order: order
+            });
+        }); 
     }
     else {
         req.order.json(function(order) {
@@ -307,45 +292,19 @@ exports.all = function(req, res) {
 };
 
 exports.requestDriver = function(req, res) {
-    if(req.order === null || req.order.status != 'PENDING') {
+    if(req.order === null || (req.order.status != 'FAILED' && req.order.status != 'PENDING') ) {
         return res.status(400).send({
             error: 'order not found.', 
             code: 'INVALID_ORDER_ID'
         });
     }
 
-    var driverId = req.body.driverId;
+    orderman.startFindDriver(req.order);
 
-    db.User.find({where: {id: driverId, status: 'ACTIVE', type: 'DRIVER'}})
-        .success(function(driver) {
-            if(!driver) {
-                return res.status(400).send({
-                    code: "INVALID_DRIVER_ID",
-                    error: "No driver found with the specified id"
-                });
-            }
-            else {
-                notification.sendNotification(driverId, {
-                    type: 'ORDER_REQUEST',
-                    message: 'You received a delivery request.',
-                    data: {
-                        orderId: req.order.id
-                    }
-                }, function() {
-                    return res.status(400).send({
-                        code: "OK",
-                        error: ""
-                    });
-                });
-            }
-        })
-        .error(function(err) {
-            console.log(err);
-            return res.status(400).send({
-                error: "Unexpected error.",
-                code: "UNEXPECTED_ERROR"
-            });
-        });
+    return res.send({
+        error: "",
+        code: ""
+    });
 };
 
 exports.acceptOrder = function(req, res) {
@@ -397,9 +356,7 @@ exports.denyOrder = function(req, res) {
         // driverId = req.body.driverId;
     // }
 
-    var list = JSON.parse(req.order.driverCheckList);
-    list.push(driverId);
-    req.order.driverCheckList = JSON.stringify(list);
+    orderman.findNextDriver(req.order, driverId);
 
     req.order.save()
         .success(function(a){

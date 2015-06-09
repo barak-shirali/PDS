@@ -53,7 +53,7 @@ module.exports = function(sequelize, DataTypes) {
 			},
 			comment: DataTypes.TEXT,
 			status: {
-				type: DataTypes.ENUM('DRAFTED', 'PENDING', 'ACCEPTED', 'PICKED', 'COMPLETED', 'CANCELED'),
+				type: DataTypes.ENUM('DRAFTED', 'PENDING', 'SEARCHING', 'FAILED', 'ACCEPTED', 'PICKED', 'COMPLETED', 'CANCELED'),
 				defaultValue: 'DRAFTED'
 			},
 			driverCheckList: DataTypes.TEXT
