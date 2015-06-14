@@ -320,19 +320,21 @@ exports.acceptOrder = function(req, res) {
 
     req.order.save()
         .success(function(a){
-            notification.sendNotification(req.order.srs_id, {
-                type: 'ORDER_ACCEPTED',
-                message: req.user.firstname + ' ' + req.user.lastname + ' has accepted your request.',
-                data: {
-                    orderId: req.order.id,
-                    driverId: req.user.id
-                }
-            }, function() {
-                return res.jsonp({
-                    code: 'OK',
-                    error: ''
-                });
-            });            
+            req.order.json(function(order) {
+                notification.sendNotification(req.order.srs_id, {
+                    type: 'ORDER_ACCEPTED',
+                    message: req.user.firstname + ' ' + req.user.lastname + ' has accepted your request.',
+                    data: {
+                        order: order,
+                        driverId: req.user.id
+                    }
+                }, function() {
+                    return res.jsonp({
+                        code: 'OK',
+                        error: ''
+                    });
+                });     
+            });       
         }).error(function(err){
             return res.status(400).send({
                 error: "Unexpected error.",
@@ -360,19 +362,21 @@ exports.denyOrder = function(req, res) {
 
     req.order.save()
         .success(function(a){
-            notification.sendNotification(req.order.srs_id, {
-                type: 'ORDER_DENIED',
-                message: req.user.firstname + ' ' + req.user.lastname + ' has denied your request.',
-                data: {
-                    orderId: req.order.id,
-                    driverId: req.user.id
-                }
-            }, function() {
-                return res.jsonp({
-                    code: 'OK',
-                    error: ''
+            req.order.json(function(order) {
+                notification.sendNotification(req.order.srs_id, {
+                    type: 'ORDER_DENIED',
+                    message: req.user.firstname + ' ' + req.user.lastname + ' has denied your request.',
+                    data: {
+                        order: order,
+                        driverId: req.user.id
+                    }
+                }, function() {
+                    return res.jsonp({
+                        code: 'OK',
+                        error: ''
+                    });
                 });
-            });     
+            });  
         }).error(function(err){
             return res.status(400).send({
                 error: "Unexpected error.",
@@ -459,19 +463,21 @@ exports.cancelOrder = function(req, res) {
 
     req.order.save()
         .success(function(review) {
-            notification.sendNotification(req.order.srs_id, {
-                type: 'ORDER_CANCELED',
-                message: req.user.firstname + ' ' + req.user.lastname + ' has canceled the delivery.',
-                data: {
-                    orderId: req.order.id,
-                    driverId: req.user.id
-                }
-            }, function() {
-                return res.jsonp({
-                    code: 'OK',
-                    error: ''
+            req.order.json(function(order) {
+                notification.sendNotification(req.order.srs_id, {
+                    type: 'ORDER_CANCELED',
+                    message: req.user.firstname + ' ' + req.user.lastname + ' has canceled the delivery.',
+                    data: {
+                        order: order,
+                        driverId: req.user.id
+                    }
+                }, function() {
+                    return res.jsonp({
+                        code: 'OK',
+                        error: ''
+                    });
                 });
-            });  
+            }); 
         }).error(function(err){
             return res.status(400).send({
                 error: "Unexpected error.",
@@ -491,19 +497,21 @@ exports.pickupOrder = function(req, res) {
 
     req.order.save()
         .success(function(review) {
-            notification.sendNotification(req.order.srs_id, {
-                type: 'ORDER_PICKEDUP',
-                message: req.user.firstname + ' ' + req.user.lastname + ' has picked up your order.',
-                data: {
-                    orderId: req.order.id,
-                    driverId: req.user.id
-                }
-            }, function() {
-                return res.jsonp({
-                    code: 'OK',
-                    error: ''
-                });
-            });  
+            req.order.json(function(order) {
+                notification.sendNotification(req.order.srs_id, {
+                    type: 'ORDER_PICKEDUP',
+                    message: req.user.firstname + ' ' + req.user.lastname + ' has picked up your order.',
+                    data: {
+                        order: order,
+                        driverId: req.user.id
+                    }
+                }, function() {
+                    return res.jsonp({
+                        code: 'OK',
+                        error: ''
+                    });
+                }); 
+            });
         }).error(function(err){
             return res.status(400).send({
                 error: "Unexpected error.",
@@ -519,25 +527,27 @@ exports.almostThereOrder = function(req, res) {
         });
     }
 
-    notification.sendNotification(req.order.srs_id, {
-        type: 'ORDER_2MIN_AWAY',
-        message: 'Your order has almost delivered. Just 2 mins away.',
-        data: {
-            orderId: req.order.id,
-            driverId: req.user.id
-        }
-    }, function() {
+    req.order.json(function(order) {
+        notification.sendNotification(req.order.srs_id, {
+            type: 'ORDER_2MIN_AWAY',
+            message: 'Your order has almost delivered. Just 2 mins away.',
+            data: {
+                order: order,
+                driverId: req.user.id
+            }
+        }, function() {
 
-        twilio.sendMessage({
-            to: req.order.srs_id,
-            body: 'Your order has almost delivered. Just 2 mins away.'
-        }, function(err, responseData) {
-            return res.jsonp({
-                code: 'OK',
-                error: ''
+            twilio.sendMessage({
+                to: req.order.srs_id,
+                body: 'Your order has almost delivered. Just 2 mins away.'
+            }, function(err, responseData) {
+                return res.jsonp({
+                    code: 'OK',
+                    error: ''
+                });
             });
         });
-    });  
+    });
 };
 
 exports.dropoffOrder = function(req, res) {
@@ -550,19 +560,21 @@ exports.dropoffOrder = function(req, res) {
 
     req.order.save()
         .success(function(review) {
-            notification.sendNotification(req.order.srs_id, {
-                type: 'ORDER_DROPPEDOFF',
-                message: req.user.firstname + ' ' + req.user.lastname + ' has dropped off your order.',
-                data: {
-                    orderId: req.order.id,
-                    driverId: req.user.id
-                }
-            }, function() {
-                return res.jsonp({
-                    code: 'OK',
-                    error: ''
-                });
-            });  
+            req.order.json(function(order) {
+                notification.sendNotification(req.order.srs_id, {
+                    type: 'ORDER_DROPPEDOFF',
+                    message: req.user.firstname + ' ' + req.user.lastname + ' has dropped off your order.',
+                    data: {
+                        order: order,
+                        driverId: req.user.id
+                    }
+                }, function() {
+                    return res.jsonp({
+                        code: 'OK',
+                        error: ''
+                    });
+                }); 
+            });
         }).error(function(err){
             return res.status(400).send({
                 error: "Unexpected error.",

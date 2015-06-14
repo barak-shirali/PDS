@@ -7,7 +7,7 @@ var notification = require('./notification');
 
 var getNearestDrivers = function(latitude, longitude, denied_drivers, count, next) {
     denied_drivers.push(0);
-    db.sequelize.query('SELECT * FROM Users WHERE Users.id NOT IN ' + '(' + denied_drivers.join() + ')' + ' AND Users.status = "ACTIVE" and Users.type = "DRIVER" ORDER BY haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) ASC LIMIT 0, ' + count, db.User)
+    db.sequelize.query('SELECT * FROM Users WHERE Users.id NOT IN ' + '(' + denied_drivers.join() + ')' + ' AND Users.status = "ACTIVE" and Users.type = "DRIVER" AND haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) <= 80467.2 ORDER BY haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) ASC LIMIT 0, ' + count, db.User)
         .then(function(users) {
             next(users);
         }, function(err) {
@@ -46,34 +46,36 @@ var findNextDriver = function(order, denyingDriverId) {
 			order.save().success(function() {
 				order.getSRS().then(function(srs) {
 					getNearestDrivers(srs.latitude, srs.longitude, list, 10, function(driver) {
-						if(driver === null || driver.length === 0) {
-							//failed
-							order.status = 'FAILED';
-							order.save();
-							notification.sendNotification(srs.id, {
-			                    type: 'ORDER_FAILED',
-			                    message: 'We could not find any available driver for your order.',
-			                    data: {
-			                        orderId: order.id
-			                    }
-			                }, function() {
-			                });
-						}
-						else {
-							driver = driver[0];
-							//request
-							notification.sendNotification(driver.id, {
-			                    type: 'ORDER_REQUEST',
-			                    message: 'You received a delivery request.',
-			                    data: {
-			                        orderId: order.id
-			                    }
-			                }, function() {
-			                	setTimeout(function() {
-			                		findNextDriver(order, driver.id);
-			                	}, config.DRIVER_WAITING_TIME * 1000);
-			                });
-						}
+						order.json(function(orderJSON) {
+							if(driver === null || driver.length === 0) {
+								//failed
+								order.status = 'FAILED';
+								order.save();
+								notification.sendNotification(srs.id, {
+				                    type: 'ORDER_FAILED',
+				                    message: 'We could not find any available driver for your order.',
+				                    data: {
+				                        order: orderJSON
+				                    }
+				                }, function() {
+				                });
+							}
+							else {
+								driver = driver[0];
+								//request
+								notification.sendNotification(driver.id, {
+				                    type: 'ORDER_REQUEST',
+				                    message: 'You received a delivery request.',
+				                    data: {
+				                        order: orderJSON
+				                    }
+				                }, function() {
+				                	setTimeout(function() {
+				                		findNextDriver(order, driver.id);
+				                	}, config.DRIVER_WAITING_TIME * 1000);
+				                });
+							}
+						});
 					});
 				});
 			})
