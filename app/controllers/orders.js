@@ -538,7 +538,7 @@ exports.almostThereOrder = function(req, res) {
         }, function() {
 
             twilio.sendMessage({
-                to: req.order.srs_id,
+                to: req.order.dropoffPhone,
                 body: 'Your order has almost delivered. Just 2 mins away.'
             }, function(err, responseData) {
                 return res.jsonp({
