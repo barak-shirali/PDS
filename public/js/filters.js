@@ -1,4 +1,4 @@
-angular.module('das.system')
+MetronicApp
 	.filter('nl2br', function($sce){
 	    return function(msg,is_xhtml) { 
 	        var xhtml = is_xhtml || true;
