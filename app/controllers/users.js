@@ -37,7 +37,7 @@ exports.session = function(req, res, next) {
  */
 
 exports.signout = function(req, res) {
-  req.logout();
+  // req.logout();
   return res.jsonp({
     error: '',
     code: 'OK'

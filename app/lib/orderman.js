@@ -67,7 +67,8 @@ var findNextDriver = function(order, denyingDriverId) {
 				                    type: 'ORDER_REQUEST',
 				                    message: 'You received a delivery request.',
 				                    data: {
-				                        order: orderJSON
+				                        order: orderJSON,
+                        				orderId: order.id
 				                    }
 				                }, function() {
 				                	setTimeout(function() {

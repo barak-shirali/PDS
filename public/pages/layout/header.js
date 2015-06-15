@@ -1,6 +1,6 @@
 /* Setup Layout Part - Header */
-MetronicApp.controller('HeaderController', ['$scope', function($scope) {
-    $scope.$on('$includeContentLoaded', function() {
+MetronicApp.controller('HeaderController', ['$rootScope', '$scope', function($rootScope, $scope) {
+	$scope.$on('$includeContentLoaded', function() {
         Layout.initHeader(); // init header
     });
 }]);

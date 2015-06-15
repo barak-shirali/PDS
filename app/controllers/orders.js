@@ -326,6 +326,7 @@ exports.acceptOrder = function(req, res) {
                     message: req.user.firstname + ' ' + req.user.lastname + ' has accepted your request.',
                     data: {
                         order: order,
+                        orderId: order.id,
                         driverId: req.user.id
                     }
                 }, function() {
@@ -368,6 +369,7 @@ exports.denyOrder = function(req, res) {
                     message: req.user.firstname + ' ' + req.user.lastname + ' has denied your request.',
                     data: {
                         order: order,
+                        orderId: order.id,
                         driverId: req.user.id
                     }
                 }, function() {
@@ -469,6 +471,7 @@ exports.cancelOrder = function(req, res) {
                     message: req.user.firstname + ' ' + req.user.lastname + ' has canceled the delivery.',
                     data: {
                         order: order,
+                        orderId: order.id,
                         driverId: req.user.id
                     }
                 }, function() {
@@ -503,6 +506,7 @@ exports.pickupOrder = function(req, res) {
                     message: req.user.firstname + ' ' + req.user.lastname + ' has picked up your order.',
                     data: {
                         order: order,
+                        orderId: order.id,
                         driverId: req.user.id
                     }
                 }, function() {
@@ -533,6 +537,7 @@ exports.almostThereOrder = function(req, res) {
             message: 'Your order has almost delivered. Just 2 mins away.',
             data: {
                 order: order,
+                orderId: order.id,
                 driverId: req.user.id
             }
         }, function() {
@@ -566,6 +571,7 @@ exports.dropoffOrder = function(req, res) {
                     message: req.user.firstname + ' ' + req.user.lastname + ' has dropped off your order.',
                     data: {
                         order: order,
+                        orderId: order.id,
                         driverId: req.user.id
                     }
                 }, function() {

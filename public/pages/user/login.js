@@ -22,7 +22,7 @@ MetronicApp
                 }
             });
     }])
-    .controller('loginController', ['$rootScope', '$scope', '$state', 'currentUser', function($rootScope, $scope, $state, currentUser) {
+    .controller('loginController', ['$rootScope', '$scope', '$state', 'currentUser', 'Users', function($rootScope, $scope, $state, currentUser, Users) {
         $scope.$on('$viewContentLoaded', function() {   
             // initialize core components
             Metronic.initAjax();
@@ -37,4 +37,19 @@ MetronicApp
         }
 
         $rootScope.currentUser = currentUser;
+        $scope.email = '';
+        $scope.password = '';
+        $scope.error = '';
+
+        $scope.login = function() {
+            $scope.error = '';
+            Users.login($scope.email, $scope.password, function(code, user) {
+                if(code === 'INVALID_CREDENTIAL' || code == 'UNEXPECTED_ERROR') {
+                    $scope.error = 'Invalid email or password.';
+                }
+                else {
+                    $state.go('dashboard');
+                }
+            });
+        };
     }]);

@@ -8,7 +8,8 @@ var MetronicApp = angular.module("MetronicApp", [
     "ui.bootstrap", 
     "oc.lazyLoad",  
     "ngSanitize",
-    "ngCookies"
+    "ngCookies",
+    "uiGmapgoogle-maps"
 ]); 
 
 /* Configure ocLazyLoader(refer: https://github.com/ocombe/ocLazyLoad) */
@@ -16,7 +17,14 @@ MetronicApp.config(['$ocLazyLoadProvider', function($ocLazyLoadProvider) {
     $ocLazyLoadProvider.config({
         // global configs go here
     });
-}]);
+}])
+.config(function(uiGmapGoogleMapApiProvider) {
+    uiGmapGoogleMapApiProvider.configure({
+        // key: GOOGLE_API_KEY,
+        v: '3.17',
+        libraries: 'geometry,visualization'
+    });
+});
 
 /********************************************
  BEGIN: BREAKING CHANGE in AngularJS v1.3.x:

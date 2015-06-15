@@ -27,6 +27,9 @@ MetronicApp
 						headers: { token: this.getCurrentToken() }
 					})
 					.success(function(data, status, headers, config) {
+						if(data.code == 'OK') {
+							$cookies.put('remitsystem_token', "");
+						}
 						callback(data.code);
 					})
 					.error(function(data, status, headers, config) {
@@ -52,6 +55,32 @@ MetronicApp
 					})
 					.error(function(data, status, headers, config) {
 						callback("UNEXPECTED_ERROR");
+					});
+			},
+
+			update: function(user, callback) {
+				$http
+					.put('/api/users', user, {
+						headers: { token: this.getCurrentToken() },
+					})
+					.success(function(data, status, headers, config) {
+						callback(data.code, data.error);
+					})
+					.error(function(data, status, headers, config) {
+						callback("UNEXPECTED_ERROR", data.error);
+					});
+			},
+
+			updateLocation: function(location, callback) {
+				$http
+					.post('/api/users/location', location, {
+						headers: { token: this.getCurrentToken() },
+					})
+					.success(function(data, status, headers, config) {
+						callback(data.code, data.error);
+					})
+					.error(function(data, status, headers, config) {
+						callback("UNEXPECTED_ERROR", data.error);
 					});
 			}
 		};

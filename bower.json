@@ -6,9 +6,12 @@
     "angular-cookies": "~1.4.1",
     "angular-touch": "~1.4.1",
     "angular-sanitize": "~1.4.1",
-    "angular-ui-router": "~0.2.15"
+    "angular-ui-router": "~0.2.15",
+    "angular-google-maps": "~2.1.4",
+    "underscore": "~1.8.3"
   },
   "resolutions": {
-    "angular": "1.4.1"
+    "angular": "1.4.1",
+    "lodash": ">=3.8.0"
   }
 }

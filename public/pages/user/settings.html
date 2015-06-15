@@ -1,0 +1,109 @@
+<div class="page-content">
+	<div class="page-bar ng-scope">
+		<ul class="page-breadcrumb">
+			<li>
+				<i class="fa fa-home"></i>
+				<a ui-sref="dashboard">Dashboard</a>
+				<i class="fa fa-angle-right"></i>
+			</li>
+			<li>
+				<a ui-sref="settings">User Profile</a>
+			</li>
+		</ul>
+	</div>
+	<h3 class="page-title ng-scope">
+		Profile
+	</h3>
+	<div ui-view="" class="profile-content fade-in-up ng-scope"><div class="row ng-scope">
+	<div class="col-md-12">
+		<div class="portlet light">
+			<div class="portlet-title tabbable-line">
+				<ul class="nav nav-tabs pull-left">
+					<li class="active">
+						<a href="#" data-target="#tab_personal" data-toggle="tab">Account Info</a>
+					</li>
+					<li>
+						<a href="#" data-target="#tab_password" data-toggle="tab">Change Password</a>
+					</li>
+					<li ng-show="user.type == 'SRS'">
+					<!-- <li> -->
+						<a href="#" data-target="#tab_address" data-toggle="tab" ng-click="refreshMap">Location</a>
+					</li>
+				</ul>
+			</div>
+			<div class="portlet-body">
+				<div class="tab-content">
+					<div class="alert alert-danger" ng-show="error != ''">
+						<!-- <button class="close" data-close="alert"></button> -->
+						<span>{{ error }}</span>
+					</div>
+					<div class="alert alert-info" ng-show="msg != ''">
+						<span>{{ msg }}</span>
+					</div>
+					<!-- PERSONAL INFO TAB -->
+					<div class="tab-pane active" id="tab_personal">
+						<div class="form-group">
+							<label class="control-label" ng-show="user.type == 'ADMIN' || user.type == 'DRIVER'">First Name</label>
+							<label class="control-label" ng-show="user.type == 'SRS'">Business Name</label>
+							<input type="text" class="form-control" ng-model="user.firstname">
+						</div>
+						<div class="form-group" ng-show="user.type == 'ADMIN' || user.type == 'DRIVER'">
+							<label class="control-label">Last Name</label>
+							<input type="text" class="form-control" ng-model="user.lastname">
+						</div>
+						<div class="form-group">
+							<label class="control-label">Mobile Number</label>
+							<input type="text" class="form-control" ng-model="user.phone">
+						</div>
+						<div class="margiv-top-10">
+							<button class="btn green-haze" ng-click="save()">Save Changes </button>
+						</div>
+					</div>
+					<!-- END PERSONAL INFO TAB -->
+					<!-- CHANGE PASSWORD TAB -->
+					<div class="tab-pane" id="tab_password">
+						<div class="form-group">
+							<label class="control-label">New Password</label>
+							<input type="password" class="form-control" ng-model="user.password">
+						</div>
+						<div class="form-group">
+							<label class="control-label">Re-type New Password</label>
+							<input type="password" class="form-control" ng-model="user.password1">
+						</div>
+						<div class="margin-top-10">
+							<button class="btn green-haze" ng-click="savePassword()">Save Changes </button>
+						</div>
+					</div>
+					<!-- END CHANGE PASSWORD TAB -->
+					<!-- PRIVACY SETTINGS TAB -->
+					<div class="tab-pane" id="tab_address">
+						<!-- <div class="ol-lg-6 col-md-6 col-sm-12 col-xs-12"> -->
+							<div class="form-group">
+								<label class="control-label">Address</label>
+								<input type="text" class="form-control" ng-model="user.address" ng-blur="findLatLng()">
+							</div>
+							<div class="form-group">
+								<label class="control-label">Latitude</label>
+								<input type="text" class="form-control" ng-model="user.latitude" readonly="true" />
+							</div>
+							<div class="form-group">
+								<label class="control-label">Longitude</label>
+								<input type="text" class="form-control" ng-model="user.longitude" readonly="true" />
+							</div>
+							<div class="margin-top-10">
+							<button class="btn green-haze" ng-click="saveLocation()">Save Changes </button>
+							</div>
+						<!-- </div> -->
+						<!-- <div class="ol-lg-6 col-md-6 col-sm-12 col-xs-12">
+							<style>.angular-google-map-container { height: 400px; }</style>
+							<ui-gmap-google-map center='map.center' zoom='map.zoom' refresh='map.refresh'></ui-gmap-google-map>
+						</div> -->
+						<div class="clearfix"></div>
+					</div>
+					<!-- END PRIVACY SETTINGS TAB -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div></div>
+</div>

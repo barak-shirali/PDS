@@ -39,10 +39,8 @@ MetronicApp.directive('ngSpinnerBar', ['$rootScope',
             }
         };
     }
-]);
-
-// Handle global LINK click
-MetronicApp.directive('a', function() {
+])
+.directive('a', function() {
     return {
         restrict: 'E',
         link: function(scope, elem, attrs) {
@@ -53,13 +51,35 @@ MetronicApp.directive('a', function() {
             }
         }
     };
-});
-
-// Handle Dropdown Hover Plugin Integration
-MetronicApp.directive('dropdownMenuHover', function () {
+})
+.directive('dropdownMenuHover', function () {
   return {
     link: function (scope, elem) {
       elem.dropdownHover();
     }
   };  
-});
+})
+.directive('ngReturn', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngReturn);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+})
+.directive('ngInitialFocus', ['$timeout', function ($timeout) {
+    return function (scope, element, attrs) {
+        $timeout(function() {
+            $timeout(function() {
+                var $element = angular.element(element);
+                $element.click();
+                $element.focus();
+            }, 750);
+        });
+    };
+}]);
