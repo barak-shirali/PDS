@@ -10,6 +10,7 @@ var sendGSM = function(regIds, data, next) {
 		return;
 	}
 	console.log('---Sending GSM to ' + regIds.join());
+	console.log(data);
 
 	var message = new gcm.Message({
 	    collapseKey: 'RemitSystem',

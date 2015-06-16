@@ -7,7 +7,7 @@ var notification = require('./notification');
 
 var getNearestDrivers = function(latitude, longitude, denied_drivers, count, next) {
     denied_drivers.push(0);
-    db.sequelize.query('SELECT * FROM Users WHERE Users.id NOT IN ' + '(' + denied_drivers.join() + ')' + ' AND Users.status = "ACTIVE" and Users.type = "DRIVER" AND haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) <= 80467.2 ORDER BY haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) ASC LIMIT 0, ' + count, db.User)
+    db.sequelize.query('SELECT * FROM Users WHERE Users.id NOT IN ' + '(' + denied_drivers.join() + ')' + ' AND Users.onlineStatus = "ONLINE" AND Users.status = "ACTIVE" and Users.type = "DRIVER" AND haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) <= 80467.2 ORDER BY haversineDistance(' + latitude + ', ' + longitude + ', Users.latitude, Users.longitude) ASC LIMIT 0, ' + count, db.User)
         .then(function(users) {
             next(users);
         }, function(err) {

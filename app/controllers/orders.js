@@ -327,7 +327,8 @@ exports.acceptOrder = function(req, res) {
                     data: {
                         order: order,
                         orderId: order.id,
-                        driverId: req.user.id
+                        driverId: req.user.id,
+                        driver: order.driver
                     }
                 }, function() {
                     return res.jsonp({
