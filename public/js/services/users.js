@@ -82,6 +82,58 @@ MetronicApp
 					.error(function(data, status, headers, config) {
 						callback("UNEXPECTED_ERROR", data.error);
 					});
+			},
+
+			all: function(callback) {
+				$http
+					.get('/bam/users', {
+						headers: { token: this.getCurrentToken() },
+					})
+					.success(function(data, status, headers, config) {
+						callback(data.code, data.users);
+					})
+					.error(function(data, status, headers, config) {
+						callback("UNEXPECTED_ERROR");
+					});
+			},
+
+			get: function(id, callback) {
+				$http
+					.get('/bam/users/' + id, {
+						headers: { token: this.getCurrentToken() },
+					})
+					.success(function(data, status, headers, config) {
+						callback(data.code, data.user);
+					})
+					.error(function(data, status, headers, config) {
+						callback("UNEXPECTED_ERROR");
+					});
+			},
+
+			create: function(user, callback) {
+				$http
+					.post('/bam/users', user, {
+						headers: { token: this.getCurrentToken() },
+					})
+					.success(function(data, status, headers, config) {
+						callback(data.code, data.error, data.user);
+					})
+					.error(function(data, status, headers, config) {
+						callback(data.code, data.error, null);
+					});
+			},
+
+			updateUser: function(id, user, callback) {
+				$http
+					.put('/bam/users/' + id, user, {
+						headers: { token: this.getCurrentToken() },
+					})
+					.success(function(data, status, headers, config) {
+						callback(data.code, data.error, data.user);
+					})
+					.error(function(data, status, headers, config) {
+						callback(data.code, data.error, null);
+					});
 			}
 		};
 	}]);

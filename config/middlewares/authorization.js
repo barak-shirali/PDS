@@ -44,3 +44,12 @@ exports.isDriver = function(req, res, next) {
     }
     next();
 };
+exports.isAdmin = function(req, res, next) {
+    if (req.user === null || typeof req.user === "undefined"|| (req.user.type != 'ADMIN')) {
+        return res.status(401).send({
+            error: 'User is not authorized',
+            code: 'UNAUTHORIZED'
+        });
+    }
+    next();
+};

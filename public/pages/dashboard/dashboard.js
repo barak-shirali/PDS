@@ -37,4 +37,6 @@ MetronicApp
         }
 
         $rootScope.currentUser = currentUser;
+
+        Layout.fixContentHeight();
     }]);

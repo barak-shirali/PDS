@@ -1,6 +1,7 @@
 var users       = require('../app/controllers/users');
 var orders      = require('../app/controllers/orders');
 var index       = require('../app/controllers/index');
+var bam       = require('../app/controllers/bam');
 
 exports.init = function(app, passport, auth) {
 
@@ -50,6 +51,13 @@ exports.init = function(app, passport, auth) {
     app.post    ('/api/orders/:orderId/complete', auth.requiresLogin, auth.isSRS, orders.completeOrder);
     app.post    ('/api/orders/:orderId/review', auth.requiresLogin, auth.isSRS, orders.reviewDriver);
     app.param   ('orderId', orders.order);
+
+
+    // BAM only
+    app.get     ('/bam/users', auth.isAdmin, bam.users_index);
+    app.post    ('/bam/users', auth.isAdmin, bam.users_create);
+    app.put     ('/bam/users/:id', auth.isAdmin, bam.users_update);
+    app.get     ('/bam/users/:id', auth.isAdmin, bam.users_get);
 
     // Home route
     app.get('/', index.render);

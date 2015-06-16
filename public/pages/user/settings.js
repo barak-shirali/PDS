@@ -118,4 +118,5 @@ MetronicApp
                 }
             });
         };
+        Layout.fixContentHeight();
     }]);

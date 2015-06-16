@@ -1,0 +1,91 @@
+<div class="page-content">
+    <div class="page-bar ng-scope">
+        <ul class="page-breadcrumb">
+            <li>
+                <i class="fa fa-home"></i>
+                <a ui-sref="dashboard">Dashboard</a>
+                <i class="fa fa-angle-right"></i>
+            </li>
+            <li>
+                <a ui-sref="users">Users</a>
+            </li>
+            <li ng-if="user.id != null">
+                <i class="fa fa-angle-right"></i>
+                <a ui-sref="users/edit({id:user.id})">{{getName(user)}}</a>
+            </li>
+        </ul>
+    </div>
+    <h3 class="page-title ng-scope" ng-if="user.id != null">
+        {{ getName(user) }}
+    </h3>
+    <h3 class="page-title ng-scope" ng-if="user.id === null">
+        Add new User
+    </h3>
+    <div class="col-md-12">
+        <div class="portlet light">
+            <div class="alert alert-danger" ng-show="error != ''">
+                <!-- <button class="close" data-close="alert"></button> -->
+                <span>{{ error }}</span>
+            </div>
+            <div class="alert alert-info" ng-show="msg != ''">
+                <span>{{ msg }}</span>
+            </div>
+
+            <div class="form-group" ng-if="user.id === null">
+                <label class="control-label">Type</label>
+                <select class="form-control" ng-model="user.type">
+                    <option value="SRS">SRS</option>
+                    <option value="DRIVER">Driver</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label" ng-show="user.type == 'ADMIN' || user.type == 'DRIVER'">First Name</label>
+                <label class="control-label" ng-show="user.type == 'SRS'">Business Name</label>
+                <input type="text" class="form-control" ng-model="user.firstname">
+            </div>
+            <div class="form-group" ng-show="user.type == 'ADMIN' || user.type == 'DRIVER'">
+                <label class="control-label">Last Name</label>
+                <input type="text" class="form-control" ng-model="user.lastname">
+            </div>
+            <div class="form-group">
+                <label class="control-label">Email</label>
+                <input type="email" class="form-control" ng-model="user.email">
+            </div>
+            <div class="form-group">
+                <label class="control-label">Password</label>
+                <input type="text" class="form-control" ng-model="user.password">
+            </div>
+            <div class="form-group">
+                <label class="control-label">Mobile Number</label>
+                <input type="text" class="form-control" ng-model="user.phone">
+            </div>
+            <div ng-show="user.type == 'SRS'">
+                <div class="form-group">
+                    <label class="control-label">Address</label>
+                    <input type="text" class="form-control" ng-model="user.address" ng-blur="findLatLng()">
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Latitude</label>
+                    <input type="text" class="form-control" ng-model="user.latitude" readonly="true" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Longitude</label>
+                    <input type="text" class="form-control" ng-model="user.longitude" readonly="true" />
+                </div>
+            </div>
+            <div class="form-group" >
+                <label class="control-label">Status</label>
+                <select class="form-control" ng-model="user.status">
+                    <option value="ACTIVE">Active</option>
+                    <option value="BLOCKED">Blocked</option>
+                </select>
+            </div>
+            <div class="margiv-top-10">
+                <button class="btn green-haze" ng-click="save()">Save Changes </button>
+                <button ui-sref="users" class="btn default">Cancel </button>
+            </div>
+        </div>
+    </div>
+</div></div>
+</div>
