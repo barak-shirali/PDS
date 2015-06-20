@@ -311,3 +311,23 @@ exports.user = function(req, res, next, id) {
     next(err);
   });
 };
+
+exports.userStats = function(req, res) {
+  db.sequelize.query("SELECT (select count(*) from `Users` where `type` = 'driver' and `status` = 'ACTIVE' and (onlineStatus = 'OFFLINE' or (  select count(*)   from Orders   where (`status` = 'ACCEPTED' OR `status` = 'PICKED')     AND Orders.driver_id = Users.id  ) > 0)) as 'active',(select count(*) from `Users` where `type` = 'driver' and `status` = 'ACTIVE' and onlineStatus = 'ONLINE' AND   (  select count(*)   from Orders   where     (`status` = 'ACCEPTED' OR `status` = 'PICKED')     AND Orders.driver_id = Users.id  ) = 0) as 'available'")
+        .then(function(info) {
+          return res.status(200).send({ 
+            error: "",
+            code: 'OK',
+            stats: {
+              active: info[0].active,
+              available: info[0].available
+            }
+          });
+        }, function(err) {
+            console.log(err);
+            return res.status(400).send({ 
+              error: "Unexpected error.",
+              code: 'UNEXPECTED_ERROR'
+            });
+        });
+};
