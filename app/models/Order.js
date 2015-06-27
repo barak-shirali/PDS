@@ -76,6 +76,7 @@ module.exports = function(sequelize, DataTypes) {
 						dropoffName: this.dropoffName,
 						comment: this.comment,
 						status: this.status,
+						paidStatus: this.paidStatus,
 						createdAt: this.createdAt,
 						updatedAt: this.updatedAt,
 						denyingDriverList:JSON.parse(this.driverCheckList),

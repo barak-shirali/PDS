@@ -139,6 +139,9 @@ exports.update = function(req, res) {
     req.user.salt = req.user.makeSalt();
     req.user.hashedPassword = req.user.encryptPassword(req.body.password, req.user.salt);
   }
+  if(req.user.type == 'DRIVER') {
+    req.user.braintreeCustomerId = req.body.braintreeCustomerId;
+  }
 
   req.user.save().success(function(){
       return res.send({

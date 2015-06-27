@@ -72,6 +72,12 @@ MetronicApp
             if(user.type == 'SRS') return user.firstname;
             return user.firstname + ' ' + user.lastname;
         };
+        $scope.getPaymentMethodStatus = function(user) {
+            // if(user.type == 'SRS') {
+            if(!user.braintreeCustomerId) return '';
+            else return 'Added';
+            // }
+        };
         $scope.$on('ngRepeatFinished', function(ngRepeatFinishedEvent) {
                 TableAdvanced.init();
                 // Layout.fixContentHeight();

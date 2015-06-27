@@ -22,7 +22,7 @@ MetronicApp
                 }
             });
     }])
-    .controller('settingsController', ['$rootScope', '$scope', '$state', 'currentUser', 'Users', 'Map', function($rootScope, $scope, $state, currentUser, Users, Map) {
+    .controller('settingsController', ['$rootScope', '$scope', '$state', 'currentUser', 'Users', 'Map', '$modal', 'Payments', function($rootScope, $scope, $state, currentUser, Users, Map, $modal, Payments) {
         $scope.$on('$viewContentLoaded', function() {   
             // initialize core components
             Metronic.initAjax();
@@ -42,6 +42,16 @@ MetronicApp
         $scope.user.password1 = '';
         $scope.error = '';
         $scope.msg = '';
+        $scope.user.creditcard = null;
+
+        $scope.loadCard = function() {
+            Payments.get_card(function(data) {
+                if(data.code == "OK") {
+                    $scope.user.creditcard = data.creditcard;
+                }
+            });
+        };
+        $scope.loadCard();
 
         $scope.refreshMap = function() {
             $scope.map.refresh = true;
@@ -118,5 +128,58 @@ MetronicApp
                 }
             });
         };
+        $scope.addPaymentMethod = function() {
+            var modalInstance = $modal.open({
+                templateUrl: 'AddPaymentMethodDialog.html',
+                controller: 'AddPaymentMethodDialogCtrl',
+                resolve: {
+                    currentUser: function() { return currentUser; }
+                }
+            });
+
+            modalInstance.result.then(function (creditcard) {
+                $scope.user.creditcard = creditcard;
+            }, function () {
+            });
+        };
         Layout.fixContentHeight();
-    }]);
+    }])
+    
+    .controller('AddPaymentMethodDialogCtrl', function ($scope, $modalInstance, currentUser, Payments) {
+        $scope.creditcard = {
+            type: '',
+            number: '',
+            expire_month: '',
+            expire_year: '',
+            cvv2: '',
+            first_name: currentUser.firstname,
+            last_name: currentUser.lastname,
+            billing_address: {
+                line1: currentUser.address,
+                city: '',
+                country_code: '',
+                state: '',
+                postal_code: ''
+            }
+        };
+        $scope.error = '';
+        $scope.ok = function () {
+            Payments.add_card($scope.creditcard, function(data) {
+                if(data.code == 'OK') {
+                    $modalInstance.close(data.creditcard);
+                }
+                else {
+                    $scope.error = data.detail.response.details[0].field.replace(/_/g, ' ').replace('.', ' - ').captializeFirstLetter() + ' : ' + data.detail.response.details[0].issue;
+                    console.log(data);
+                }
+            });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+        String.prototype.captializeFirstLetter = function() {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        };
+    });

@@ -22,7 +22,7 @@ MetronicApp
                 }
             });
     }])
-    .controller('dashboardController', ['$rootScope', '$scope', '$state', 'currentUser', function($rootScope, $scope, $state, currentUser) {
+    .controller('dashboardController', ['$rootScope', '$scope', '$state', 'currentUser', 'Payments', function($rootScope, $scope, $state, currentUser, Payments) {
         $scope.$on('$viewContentLoaded', function() {   
             // initialize core components
             Metronic.initAjax();
@@ -39,4 +39,23 @@ MetronicApp
         $rootScope.currentUser = currentUser;
 
         Layout.fixContentHeight();
+
+        $scope.lastweek = null;
+
+        var loadPayment = function() {
+            Payments.all(function(code, payments) {
+                $scope.payments = payments;
+                console.log(payments);
+
+                $scope.paymentsDue = _.filter($scope.payments, function(payment) {
+                    return payment.status == 'DUE' || payment.status == 'FAILED';
+                });
+                $scope.paymentsSuccess = _.filter($scope.payments, function(payment) {
+                    return payment.status == 'PAID' || payment.status == 'FAILED';
+                });
+
+            });
+        };
+
+        loadPayment();
     }]);

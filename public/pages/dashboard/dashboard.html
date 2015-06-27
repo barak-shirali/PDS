@@ -1,3 +1,145 @@
 <div class="page-content">
-	Dashjboard
+	<div class="page-bar ng-scope">
+		<ul class="page-breadcrumb">
+			<li>
+				<i class="fa fa-home"></i>
+				<a ui-sref="dashboard">Dashboard</a>
+				<i class="fa fa-angle-right"></i>
+			</li>
+		</ul>
+	</div>
+	<h3 class="page-title ng-scope">
+		Dashboard
+	</h3>
+	<div class="col-md-12">
+		<div class="portlet light">
+			<div class="portlet-title tabbable-line">
+				<ul class="nav nav-tabs pull-left">
+					<li class="active">
+						<a href="#" data-target="#tab_duepayments" data-toggle="tab">Payments Due</a>
+					</li>
+					<li>
+						<a href="#" data-target="#tab_pasttransactions" data-toggle="tab">Past payment</a>
+					</li>
+				</ul>
+			</div>
+			<div class="portlet-body">
+				<div class="tab-content">
+					<!-- PERSONAL INFO TAB -->
+					<div class="tab-pane active" id="tab_duepayments">
+						<div ng-repeat="payment in paymentsDue">
+							<span class="caption-subject font-blue-madison bold uppercase">Payments ({{payment.dateStart | date:'MMM d, y'}} ~ {{payment.dateEnd | date:'MMM d, y'}})</span>
+							<table class="table table-hover table-light">
+								<thead>
+									<tr class="uppercase">
+										<th ng-if="currentUser.type == 'SRS'">Driver</th>
+										<th ng-if="currentUser.type == 'DRIVER'">Time/Date</th>
+										<th>Drop Address</th>
+										<th class="text-right">Cash</th>
+										<th class="text-right">Credit card</th>
+										<th class="text-right">Driver Tip</th>
+										<th class="text-right">Driver Fee</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="item in payment.paymentItems">
+										<td ng-if="currentUser.type == 'SRS'">{{item.order.driver.firstname}} {{item.order.driver.lastname}}</td>
+										<td ng-if="currentUser.type == 'DRIVER'">{{item.order.updatedAt | date:'MMM d, y'}}</td>
+										<td>{{item.order.dropoffAddress}}</td>
+										<td class="text-right">
+											<span ng-if="item.order.paymentType == 'CASH'" class="text-right">{{item.order.paymentAmount | currency}}</span>
+											<span ng-if="item.order.paymentType != 'CASH'" class="text-right">{{0 | currency}}</span>
+										</td>
+										<td class="text-right">
+											<span ng-if="item.order.paymentType == 'CREDIT_CARD'" class="text-right">{{item.order.paymentAmount | currency}}</span>
+											<span ng-if="item.order.paymentType != 'CREDIT_CARD'" class="text-right">{{0 | currency}}</span>
+										</td>
+										<td class="text-right">{{item.order.paymentTip | currency}}</td>
+										<td class="text-right">{{10 | currency}}</td>
+									</tr>
+									<tr>
+										<td colspan="6">&nbsp;</td>
+									</tr>
+									<tr>
+										<td>Total</td>
+										<td>Total Cash</td>
+										<td class="text-right">{{payment.totalCash | currency}}</td>
+										<td></td>
+										<td>Total Fee</td>
+										<td class="text-right">{{payment.totalFee | currency}}</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>Driver Tip</td>
+										<td class="text-right">{{payment.totalTip | currency}}</td>
+									</tr>
+									<tr>
+										<td>Substract Cash</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>- Cash</td>
+										<td class="text-right">- {{payment.totalCash | currency}}</td>
+									</tr>
+									<tr ng-if="currentUser.type == 'DRIVER'">
+										<td>Substract Service Fee</td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>- 10%</td>
+										<td class="text-right">- {{payment.serviceFee | currency}}</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td>Recurring billing</td>										
+										<td class="text-right">{{payment.totalAmount | currency}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div ng-show="paymentsDue.length == 0"><center>There is no payments pending at this moment</center></div>
+					</div>
+					<!-- END PERSONAL INFO TAB -->
+					<!-- CHANGE PASSWORD TAB -->
+					<div class="tab-pane" id="tab_pasttransactions">
+						<table class="table table-hover table-light">
+							<thead>
+								<tr class="uppercase">
+									<th>Time/Date</th>
+									<th class="text-right">Cash</th>
+									<th class="text-right">Credit card</th>
+									<th class="text-right">Driver Tip</th>
+									<th class="text-right">Driver Fee</th>
+									<th class="text-right" ng-if="currentUser.type == 'DRIVER'">Service Fee</th>
+									<th class="text-right">Amount</th>
+									<th class="text-right">Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="payment in paymentsSuccess">
+									<td>{{payment.dateStart | date:'MMM d, y'}} ~ {{payment.dateEnd | date:'MMM d, y'}}</td>
+									<td class="text-right">{{payment.totalCash | currency}}</td>
+									<td class="text-right">{{payment.totalCreditCard | currency}}</td>
+									<td class="text-right">{{payment.totalTip | currency}}</td>
+									<td class="text-right">{{payment.totalFee | currency}}</td>
+									<td class="text-right" ng-if="currentUser.type == 'DRIVER'">{{payment.serviceFee | currency}}</td>
+									<td class="text-right">{{payment.totalAmount | currency}}</td>
+									<td class="text-right">{{payment.status == 'PAID' ? 'Paid' : 'Failed'}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<div ng-show="paymentsSuccess.length == 0"><center>There is no payment history.</center></div>
+					</div>
+					<!-- END CHANGE PASSWORD TAB -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div></div>
 </div>

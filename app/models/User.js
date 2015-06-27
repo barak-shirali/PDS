@@ -76,6 +76,14 @@ module.exports = function(sequelize, DataTypes) {
 			status: {
 				type: DataTypes.ENUM('UNVERIFIED', 'ACTIVE', 'DELETED', 'BLOCKED'),
 				defaultValue: 'UNVERIFIED'
+			},
+			braintreeCustomerId: {
+				type: DataTypes.STRING(256),
+				defaultValue: ""
+			},
+			braintreePaymentNonce: {
+				type: DataTypes.STRING(256),
+				defaultValue: ""
 			}
 		},
 		{ 
@@ -107,7 +115,7 @@ module.exports = function(sequelize, DataTypes) {
 					return crypto.pbkdf2Sync(password, salt, 10000, 64).toString('base64');
 				},
 				json: function() {
-					return {
+					var ret = {
 						id: this.id,
 						firstname: this.firstname,
 						lastname: this.lastname,
@@ -122,6 +130,12 @@ module.exports = function(sequelize, DataTypes) {
 						createdAt: this.createdAt,
 						updatedAt: this.updatedAt
 					};
+
+					if(ret.type == 'DRIVER') {
+						ret.braintreeCustomerId = this.braintreeCustomerId;
+					}
+
+					return ret;
 				}
 			},
 			associate: function(models) {
@@ -130,6 +144,7 @@ module.exports = function(sequelize, DataTypes) {
 				User.hasMany(models.Order, { as: 'SRSOrders', foreignKey: 'srs_id'});
 				User.hasMany(models.Order, { as: 'DriverOrders', foreignKey: 'driver_id'});
 				User.hasMany(models.Review);
+				User.hasMany(models.Payment);
 			}
 		}
 	);

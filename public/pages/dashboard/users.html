@@ -57,6 +57,9 @@
 									Status
 								</th>
 								<th class="hidden-xs">
+									Payment method
+								</th>
+								<th class="hidden-xs">
 								</th>
 							</tr>
 						</thead>
@@ -67,6 +70,7 @@
 								<td>{{user.email}}</td>
 								<td>{{user.address}}</td>
 								<td>{{getStatus(user)}}</td>
+								<td>{{getPaymentMethodStatus(user)}}</td>
 								<td>
 									<a ui-sref="users/edit({id:user.id})"><i class="icon-pencil"></i>Edit</a>
 									<!-- <a href="#" ng-click="delete(user)"><i class="icon-trash"></i>Delete</a> -->

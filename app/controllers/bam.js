@@ -4,6 +4,10 @@ var moment = require('moment');
 var async = require('async');
 var validator = require('validator');
 var mailer = require('../lib/mailer');
+var _ = require('lodash');
+var config = require('../../config/config');
+var braintree = require('../lib/braintree');
+var paypal = require('../../config/paypal');
 
 exports.users_index = function(req, res) {
 	db.User.findAll({status: {ne: 'DELETED'}})
@@ -189,4 +193,194 @@ exports.users_get = function(req, res) {
             code: 'INVALID_USER_ID'
         });
     });
+};
+
+exports.payments_index = function(req, res) {
+	db.Payment.findAll({ 
+			where: {UserId: req.user.id}, 
+			include: [ 
+				{
+					model: db.PaymentItem, 
+					include: [
+						{
+							model: db.Order
+						}
+					]
+				}
+			],
+			order: [['dateStart', 'DESC']]
+		})
+		.success(function(payments) {
+			var operations = [];
+			var results = [];
+			_.each(payments, function(payment, i) {
+				_.each(payment.paymentItems, function(item, j) {
+					operations.push(function(next) {
+						item.order.json(function(order) {
+							payments[i].paymentItems[j].dataValues.order = order;
+							next();
+						});
+					});
+				});
+			});
+			async.series(operations, function() {
+				return res.send({
+					error: '',
+					code: 'OK',
+					payments: payments
+				});
+			});
+		})
+		.error(function(err) {
+			console.log(err);
+			return res.status(400).send({ 
+			  error: "Unexpected error.",
+			  code: "UNEXPECTED_ERROR"
+			});
+		});
+};
+exports.payments_braintree_token = function(req, res) {
+	var generateToken = function() {
+		braintree.clientToken.generate({
+			customerId: req.user.braintreeCustomerId
+		}, function (err, response) {
+			res.send(response.clientToken);
+		});
+	};
+	if(!req.user.braintreeCustomerId) {
+		braintree.customer.create({}, function(err, result) {
+			if(err) {
+				console.log(err);
+			}
+			else {
+				req.user.braintreeCustomerId = result.customer.id;
+				req.user.save();
+				generateToken();
+			}
+		});
+	}
+	else {
+		generateToken();
+	}
+};
+exports.payments_braintree_driver = function(req, res) {
+	merchantAccountParams = req.body;
+	merchantAccountParams.tosAccepted = true;
+	merchantAccountParams.masterMerchantAccountId = config.braintree.MERCHANT_ID;
+
+	braintree.merchantAccount.create(merchantAccountParams, function (err, result) {
+		if(err) {
+			console.log(err);
+			res.status(400).send({
+				error: "There's error occured while processing your request.",
+				code: "BRAINTREE_ERROR"
+			});
+		}
+		else {
+			req.user.braintreeCustomerId = result.id;
+			req.user.braintreePaymentNonce = "";
+			req.user.save();
+			res.send({
+
+			});
+		}
+	});
+};
+exports.braintree_webhook = function (req, res) {
+  // res.send(braintree.webhookNotification.verify(req.query.bt_challenge));
+  // return;
+  braintree.webhookNotification.parse(req.body.bt_signature, req.body.bt_payload, function (err, webhookNotifiction) {
+		if(webhookNotification.kind === braintree.webhookNotification.Kind.SubMerchantAccountApproved) {
+			db.User.find({where: {braintreeCustomerId: webhookNotification.merchantAccount.id}}).success(function(user) {
+		      if(user) {
+		    	user.braintreePaymentNonce = "ACTIVE";
+		    	user.save();
+		      }
+		    	res.send({});
+		    }).error(function() {
+		    	res.send({});
+		    });
+		}
+		else if(webhookNotification.kind === WebhookNotification.Kind.SubMerchantAccountDeclined) {
+		    res.send({});
+		}
+	});
+};
+
+exports.payments_paypal_save_card = function(req, res) {
+	req.body.payer_id = req.user.id;
+	paypal.creditCard.create(req.body, function(error, credit_card){
+		if (error) {
+			console.log(error);
+			res.status(400).send({
+				error: "There's error occured while processing your request.",
+				detail: error,
+				code: "PAYPAL_ERROR"
+			});
+		} else {
+			console.log("Create Credit-Card Response");
+			console.log(credit_card);
+			if(req.user.braintreeCustomerId) {
+				paypal.creditCard.del(req.user.braintreeCustomerId, function(err, no_response) {
+
+				});
+			}
+			req.user.braintreeCustomerId = credit_card.id;
+			req.user.save()
+				.success(function() {
+					return res.send({
+						code: "OK",
+						error: "",
+						creditcard: credit_card
+					});
+				})
+				.error(function(err) {
+					console.log(err);
+					return res.status(400).send({ 
+					  error: "Unexpected error.",
+					  code: "UNEXPECTED_ERROR"
+					});					
+				});
+		}
+	});
+};
+exports.payments_paypal_get_card = function(req, res) {
+	if(req.user.braintreeCustomerId) {
+		paypal.creditCard.get(req.user.braintreeCustomerId, function(err, credit_card) {
+			if(err) {
+				console.log(err);
+				res.status(400).send({
+					error: "There's error occured while processing your request.",
+					detail: err,
+					code: "PAYPAL_ERROR"
+				});
+			}
+			else {
+				return res.send({
+						code: "OK",
+						error: "",
+						creditcard: credit_card
+					});
+			}
+		});
+	}
+	else {
+		return res.send({
+			code: "NO_CARD",
+			error: "No card added",
+			creditcard: null
+		})
+	}
+};
+exports.payments_paypal_webhook_cancel = function(req, res) {
+	console.log(res.body);
+	return res.send({});
+};
+exports.payments_paypal_webhook_success = function(req, res) {
+	console.log(res.body);
+	return res.send({});
+};
+exports.payments_paypal_webhook_ipn = function(req, res) {
+	console.log(req.body);
+	return res.send({});
 };

@@ -59,6 +59,14 @@ exports.init = function(app, passport, auth) {
     app.post    ('/bam/users', auth.isAdmin, bam.users_create);
     app.put     ('/bam/users/:id', auth.isAdmin, bam.users_update);
     app.get     ('/bam/users/:id', auth.isAdmin, bam.users_get);
+    app.get     ('/bam/payments', auth.requiresLogin, bam.payments_index);
+    app.get     ('/bam/payments/braintree/token', auth.requiresLogin, bam.payments_braintree_token);
+    app.get     ('/bam/payments/braintree/webhook', bam.braintree_webhook);
+    app.get     ('/bam/payments/paypal/card', auth.requiresLogin, bam.payments_paypal_get_card);
+    app.post    ('/bam/payments/paypal/card', auth.requiresLogin, bam.payments_paypal_save_card);
+    app.get     ('/bam/payments/paypal/webhook/cancel', bam.payments_paypal_webhook_cancel);
+    app.get     ('/bam/payments/paypal/webhook/success', bam.payments_paypal_webhook_success);
+    app.post     ('/bam/payments/paypal/webhook/ipn', bam.payments_paypal_webhook_ipn);
 
     // Home route
     app.get('/', index.render);
