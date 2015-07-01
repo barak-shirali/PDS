@@ -15,14 +15,16 @@ module.exports = function(sequelize, DataTypes) {
 		{
 			classMethods: {
 				addDevice: function(deviceInfo) {
-					UserDevice.find({where: deviceInfo})
+					var search = {
+						type: deviceInfo.type,
+          				token: deviceInfo.token,
+					};
+					UserDevice.find({where: search})
 						.success(function(device) {
 							if(device) {
-
+								device.destroy();
 							}
-							else {
-								UserDevice.create(deviceInfo);
-							}
+							UserDevice.create(deviceInfo);
 						});
 				}
 			},
