@@ -74,6 +74,7 @@ module.exports = function(sequelize, DataTypes) {
 						dropoffLatitude: this.dropoffLatitude,
 						dropoffLongitude: this.dropoffLongitude,
 						dropoffName: this.dropoffName,
+						dropoffPhone: this.dropoffPhone,
 						comment: this.comment,
 						status: this.status,
 						paidStatus: this.paidStatus,
