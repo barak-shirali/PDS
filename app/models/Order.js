@@ -78,8 +78,8 @@ module.exports = function(sequelize, DataTypes) {
 						comment: this.comment,
 						status: this.status,
 						paidStatus: this.paidStatus,
-						createdAt: this.createdAt,
-						updatedAt: this.updatedAt,
+						createdAt: Date.parse(this.createdAt)/1000,
+						updatedAt: Date.parse(this.updatedAt)/1000,
 						denyingDriverList:JSON.parse(this.driverCheckList),
 						SRS: '',
 						driver: ''
