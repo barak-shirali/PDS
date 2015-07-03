@@ -111,12 +111,20 @@ exports.auth = function(req, res) {
 exports.update = function(req, res) {
   
   if(!req.body.firstname) {
-    return res.status(400).send({ 
-      error: 'Please enter first name.',
-      code: 'EMPTY_FIRSTNAME'
-    });
+    if(req.body.type == 'SRS') {
+      return res.status(400).send({ 
+        error: 'Please enter business name.',
+        code: 'EMPTY_FIRSTNAME'
+      });
+    }
+    else {
+      return res.status(400).send({ 
+        error: 'Please enter first name.',
+        code: 'EMPTY_FIRSTNAME'
+      });
+    }
   }
-  if(!req.body.lastname) {
+  if(req.body.type != 'SRS' && !req.body.lastname) {
     return res.status(400).send({ 
       error: 'Please enter last name.',
       code: 'EMPTY_LASTNAME'

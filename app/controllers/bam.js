@@ -40,12 +40,20 @@ exports.users_create = function(req, res) {
 		});
 	}
 	if(!req.body.firstname) {
-		return res.status(400).send({ 
-		error: 'Please enter first name.',
-		code: 'EMPTY_FIRSTNAME'
-		});
+		if(req.body.type == 'SRS') {
+			return res.status(400).send({ 
+				error: 'Please enter business name.',
+				code: 'EMPTY_BUSINESSNAME'
+			});
+		}
+		else {
+			return res.status(400).send({ 
+				error: 'Please enter first name.',
+				code: 'EMPTY_FIRSTNAME'
+			});
+		}
 	}
-	if(!req.body.lastname) {
+	if(req.body.type != 'SRS' && !req.body.lastname) {
 		return res.status(400).send({ 
 		error: 'Please enter last name.',
 		code: 'EMPTY_LASTNAME'
@@ -107,12 +115,20 @@ exports.users_update = function(req, res) {
 		});
 	}
 	if(!req.body.firstname) {
-		return res.status(400).send({ 
-		error: 'Please enter first name.',
-		code: 'EMPTY_FIRSTNAME'
-		});
+		if(req.body.type == 'SRS') {
+			return res.status(400).send({ 
+				error: 'Please enter business name.',
+				code: 'EMPTY_BUSINESSNAME'
+			});
+		}
+		else {
+			return res.status(400).send({ 
+				error: 'Please enter first name.',
+				code: 'EMPTY_FIRSTNAME'
+			});
+		}
 	}
-	if(!req.body.lastname) {
+	if(req.body.type != 'SRS' && !req.body.lastname) {
 		return res.status(400).send({ 
 		error: 'Please enter last name.',
 		code: 'EMPTY_LASTNAME'
@@ -369,7 +385,7 @@ exports.payments_paypal_get_card = function(req, res) {
 			code: "NO_CARD",
 			error: "No card added",
 			creditcard: null
-		})
+		});
 	}
 };
 exports.payments_paypal_webhook_cancel = function(req, res) {
