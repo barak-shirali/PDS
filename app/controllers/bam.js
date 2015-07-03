@@ -255,6 +255,47 @@ exports.payments_index = function(req, res) {
 			});
 		});
 };
+exports.payments_get = function(req, res) {
+	db.Payment.find({ 
+			where: {id: req.params.id}, 
+			include: [ 
+				{
+					model: db.PaymentItem, 
+					include: [
+						{
+							model: db.Order
+						}
+					]
+				}
+			]
+		})
+		.success(function(payment) {
+			var operations = [];
+			_.each(payment.paymentItems, function(item, j) {
+				operations.push(function(next) {
+					item.order.json(function(order) {
+						payment.paymentItems[j].dataValues.order = order;
+						next();
+					});
+				});
+			});
+			async.series(operations, function() {
+				return res.send({
+					error: '',
+					code: 'OK',
+					payment: payment
+				});
+			});
+		})
+		.error(function(err) {
+			console.log(err);
+			return res.status(400).send({ 
+			  error: "Unexpected error.",
+			  code: "UNEXPECTED_ERROR"
+			});
+		});
+};
+
 exports.payments_braintree_token = function(req, res) {
 	var generateToken = function() {
 		braintree.clientToken.generate({

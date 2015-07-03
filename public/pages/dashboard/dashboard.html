@@ -119,6 +119,7 @@
 									<th class="text-right" ng-if="currentUser.type == 'DRIVER'">Service Fee</th>
 									<th class="text-right">Amount</th>
 									<th class="text-right">Status</th>
+									<th class="text-right">Invoice</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -131,6 +132,7 @@
 									<td class="text-right" ng-if="currentUser.type == 'DRIVER'">{{payment.serviceFee | currency}}</td>
 									<td class="text-right">{{payment.totalAmount | currency}}</td>
 									<td class="text-right">{{payment.status == 'PAID' ? 'Paid' : 'Failed'}}</td>
+									<td class="text-right"><a ui-sref="invoice({id:payment.id})"><i class='fa fa-file'></i></a></td>
 								</tr>
 							</tbody>
 						</table>
@@ -141,5 +143,4 @@
 			</div>
 		</div>
 	</div>
-</div></div>
 </div>
