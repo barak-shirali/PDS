@@ -324,7 +324,7 @@ exports.user = function(req, res, next, id) {
 };
 
 exports.userStats = function(req, res) {
-  db.sequelize.query("SELECT (select count(*) from `Users` where `type` = 'driver' and `status` = 'ACTIVE' and (onlineStatus = 'OFFLINE' or (  select count(*)   from Orders   where (`status` = 'ACCEPTED' OR `status` = 'PICKED')     AND Orders.driver_id = Users.id  ) > 0)) as 'active',(select count(*) from `Users` where `type` = 'driver' and `status` = 'ACTIVE' and onlineStatus = 'ONLINE' AND   (  select count(*)   from Orders   where     (`status` = 'ACCEPTED' OR `status` = 'PICKED')     AND Orders.driver_id = Users.id  ) = 0) as 'available'")
+  db.sequelize.query("SELECT (select count(*) from `Users` where `type` = 'driver' and `status` = 'ACTIVE' and onlineStatus = 'BUSY') as 'active',(select count(*) from `Users` where `type` = 'driver' and `status` = 'ACTIVE' and onlineStatus = 'ONLINE') as 'available'")
         .then(function(info) {
           return res.status(200).send({ 
             error: "",
