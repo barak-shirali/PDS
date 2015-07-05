@@ -16,8 +16,7 @@ module.exports = function(sequelize, DataTypes) {
 			classMethods: {
 				addDevice: function(deviceInfo) {
 					var search = {
-						type: deviceInfo.type,
-          				token: deviceInfo.token,
+						UserId: deviceInfo.UserId
 					};
 					UserDevice.find({where: search})
 						.success(function(device) {
