@@ -401,68 +401,104 @@ exports.braintree_webhook = function (req, res) {
 };
 
 exports.payments_paypal_save_card = function(req, res) {
-	req.body.payer_id = req.user.id;
-	paypal.creditCard.create(req.body, function(error, credit_card){
-		if (error) {
-			console.log(error);
-			res.status(400).send({
-				error: "There's error occured while processing your request.",
-				detail: error,
-				code: "PAYPAL_ERROR"
-			});
-		} else {
-			console.log("Create Credit-Card Response");
-			console.log(credit_card);
-			if(req.user.braintreeCustomerId) {
-				paypal.creditCard.del(req.user.braintreeCustomerId, function(err, no_response) {
+	var create_card = function(user) {
+		req.body.payer_id = user.id;
+			paypal.creditCard.create(req.body, function(error, credit_card){
+				if (error) {
+					console.log(error);
+					res.status(400).send({
+						error: "There's error occured while processing your request.",
+						detail: error,
+						code: "PAYPAL_ERROR"
+					});
+				} else {
+					console.log("Create Credit-Card Response");
+					console.log(credit_card);
+					if(user.braintreeCustomerId) {
+						paypal.creditCard.del(user.braintreeCustomerId, function(err, no_response) {
 
-				});
-			}
-			req.user.braintreeCustomerId = credit_card.id;
-			req.user.save()
-				.success(function() {
-					return res.send({
-						code: "OK",
-						error: "",
-						creditcard: credit_card
-					});
-				})
-				.error(function(err) {
-					console.log(err);
-					return res.status(400).send({ 
-					  error: "Unexpected error.",
-					  code: "UNEXPECTED_ERROR"
-					});					
-				});
-		}
-	});
-};
-exports.payments_paypal_get_card = function(req, res) {
-	if(req.user.braintreeCustomerId) {
-		paypal.creditCard.get(req.user.braintreeCustomerId, function(err, credit_card) {
-			if(err) {
-				console.log(err);
-				res.status(400).send({
-					error: "There's error occured while processing your request.",
-					detail: err,
-					code: "PAYPAL_ERROR"
-				});
-			}
-			else {
-				return res.send({
-						code: "OK",
-						error: "",
-						creditcard: credit_card
-					});
-			}
+						});
+					}
+					user.braintreeCustomerId = credit_card.id;
+					user.save()
+						.success(function() {
+							return res.send({
+								code: "OK",
+								error: "",
+								creditcard: credit_card
+							});
+						})
+						.error(function(err) {
+							console.log(err);
+							return res.status(400).send({ 
+							  error: "Unexpected error.",
+							  code: "UNEXPECTED_ERROR"
+							});					
+						});
+				}
+			});
+	};
+
+	if(req.query.id) {
+		db.User.find({ where: {id: req.query.id} }).success(function(user){
+			if(!user) {
+	            return res.status(400).send({
+	                error: 'user not found.', 
+	                code: 'INVALID_USER_ID'
+	            });
+        	} else {
+        		create_card(user);
+        	}
 		});
 	}
 	else {
-		return res.send({
-			code: "NO_CARD",
-			error: "No card added",
-			creditcard: null
+		create_card(req.user);
+	}
+};
+exports.payments_paypal_get_card = function(req, res) {
+	var get_card = function(user) {
+		if(user.braintreeCustomerId) {
+			paypal.creditCard.get(user.braintreeCustomerId, function(err, credit_card) {
+				if(err) {
+					console.log(err);
+					res.status(400).send({
+						error: "There's error occured while processing your request.",
+						detail: err,
+						code: "PAYPAL_ERROR"
+					});
+				}
+				else {
+					return res.send({
+							code: "OK",
+							error: "",
+							creditcard: credit_card
+						});
+				}
+			});
+		}
+		else {
+			return res.send({
+				code: "NO_CARD",
+				error: "No card added",
+				creditcard: null
+			});
+		}
+	};
+
+	if(req.query.id) {
+		db.User.find({ where: {id: req.query.id} }).success(function(user){
+			if(!user) {
+	            return res.status(400).send({
+	                error: 'user not found.', 
+	                code: 'INVALID_USER_ID'
+	            });
+        	} else {
+        		get_card(user);
+        	}
 		});
+	}
+	else {
+		get_card(req.user);
 	}
 };
 exports.payments_paypal_webhook_cancel = function(req, res) {

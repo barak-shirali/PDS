@@ -25,9 +25,9 @@ MetronicApp
 						callback("UNEXPECTED_ERROR", []);
 					});
 			},
-			get_card: function(callback) {
+			get_card: function(callback, user_id) {
 				$http
-					.get('/bam/payments/paypal/card', {
+					.get('/bam/payments/paypal/card' + (typeof user_id == "undefined" ? "" : '?id=' + user_id), {
 						headers: { token: Users.getCurrentToken() }
 					})
 					.success(function(data, status, headers, config) {
@@ -37,9 +37,9 @@ MetronicApp
 						callback(data);
 					});
 			},
-			add_card: function(creditcard, callback) {
+			add_card: function(creditcard, callback, user_id) {
 				$http
-					.post('/bam/payments/paypal/card', creditcard, {
+					.post('/bam/payments/paypal/card' + (typeof user_id == "undefined" ? "" : '?id=' + user_id), creditcard, {
 						headers: { token: Users.getCurrentToken() }
 					})
 					.success(function(data, status, headers, config) {

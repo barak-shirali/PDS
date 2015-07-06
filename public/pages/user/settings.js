@@ -130,10 +130,10 @@ MetronicApp
         };
         $scope.addPaymentMethod = function() {
             var modalInstance = $modal.open({
-                templateUrl: 'AddPaymentMethodDialog.html',
-                controller: 'AddPaymentMethodDialogCtrl',
+                templateUrl: '/pages/user/payment_dialog.html',
+                controller: 'PaymentMethodDialogCtrl',
                 resolve: {
-                    currentUser: function() { return currentUser; }
+                    user: function() { return currentUser; }
                 }
             });
 
@@ -145,41 +145,4 @@ MetronicApp
         Layout.fixContentHeight();
     }])
     
-    .controller('AddPaymentMethodDialogCtrl', function ($scope, $modalInstance, currentUser, Payments) {
-        $scope.creditcard = {
-            type: '',
-            number: '',
-            expire_month: '',
-            expire_year: '',
-            cvv2: '',
-            first_name: currentUser.firstname,
-            last_name: currentUser.lastname,
-            billing_address: {
-                line1: currentUser.address,
-                city: '',
-                country_code: '',
-                state: '',
-                postal_code: ''
-            }
-        };
-        $scope.error = '';
-        $scope.ok = function () {
-            Payments.add_card($scope.creditcard, function(data) {
-                if(data.code == 'OK') {
-                    $modalInstance.close(data.creditcard);
-                }
-                else {
-                    $scope.error = data.detail.response.details[0].field.replace(/_/g, ' ').replace('.', ' - ').captializeFirstLetter() + ' : ' + data.detail.response.details[0].issue;
-                    console.log(data);
-                }
-            });
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
-
-        String.prototype.captializeFirstLetter = function() {
-            return this.charAt(0).toUpperCase() + this.slice(1);
-        };
-    });
+    

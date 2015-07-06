@@ -19,11 +19,18 @@ MetronicApp
 
                         return deferred.promise;
                     }],
-                    user: ['$stateParams', '$q', 'Users', function($stateParams, $q, Users) {
+                    user: ['$stateParams', '$q', 'Users', 'Payments', function($stateParams, $q, Users, Payments) {
                         var deferred = $q.defer();
 
                         Users.get($stateParams.id, function(code, user) {
-                            if(code == 'OK') deferred.resolve(user);
+                            if(code == 'OK') {
+                                Payments.get_card(function(data) {
+                                    if(data.code == "OK") {
+                                        user.creditcard = data.creditcard;
+                                    }
+                                    deferred.resolve(user);
+                                }, user.id);
+                            }
                             else deferred.resolve(null);
                         });
 
@@ -44,7 +51,9 @@ MetronicApp
                         var deferred = $q.defer();
 
                         Users.currentUser(function(code, user) {
-                            if(code == "OK") deferred.resolve(user);
+                            if(code == "OK") {
+                                deferred.resolve(user);
+                            }
                             else deferred.resolve(null);
                         });
 
@@ -54,13 +63,14 @@ MetronicApp
                         return {
                             id: null,
                             type: 'DRIVER',
-                            status: 'ACTIVE'
+                            status: 'ACTIVE',
+                            creditcard: null
                         };
                     }]
                 }
             });
     }])
-    .controller('usersEditController', ['$rootScope', '$scope', '$state', 'currentUser', 'user', 'Users', function($rootScope, $scope, $state, currentUser, user, Users) {
+    .controller('usersEditController', ['$rootScope', '$scope', '$state', '$modal', 'currentUser', 'user', 'Users', function($rootScope, $scope, $state, $modal, currentUser, user, Users) {
         $scope.$on('$viewContentLoaded', function() {   
             // initialize core components
             Metronic.initAjax();
@@ -109,6 +119,21 @@ MetronicApp
             else {
                 Users.create(user, callback);
             }
+        };
+
+        $scope.addPaymentMethod = function() {
+            var modalInstance = $modal.open({
+                templateUrl: '/pages/user/payment_dialog.html',
+                controller: 'PaymentMethodDialogCtrl',
+                resolve: {
+                    user: function() { return $scope.user; }
+                }
+            });
+
+            modalInstance.result.then(function (creditcard) {
+                $scope.user.creditcard = creditcard;
+            }, function () {
+            });
         };
 
         Layout.fixContentHeight();

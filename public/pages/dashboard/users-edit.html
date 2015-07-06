@@ -90,5 +90,47 @@
             </div>
         </div>
     </div>
-</div></div>
+    <div ng-if="user.id != null">
+        <h3 class="page-title ng-scope" ng-if="user.id != null">
+            Payment method
+        </h3>
+        <div class="col-md-12">
+            <div class="portlet light">
+                <div ng-if="user.type == 'DRIVER'">
+                    <div class="form-group">
+                        <label class="control-label">Paypal account</label>
+                        <input type="email" class="form-control" ng-model="user.braintreeCustomerId">
+                    </div>
+                    <div class="margin-top-10">
+                        <button class="btn green-haze" ng-click="save()">Save </button>
+                    </div>
+                </div>
+                <div ng-if="user.type == 'SRS'">
+                    <div ng-show="user.creditcard != null">
+                        <div class="form-group">
+                            <label class="control-label">Card Type</label>
+                            <input type="text" class="form-control" ng-model="user.creditcard.type" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Card Number</label>
+                            <input type="text" class="form-control" ng-model="user.creditcard.number"  readonly />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Expiry date</label>
+                            <input type="text" class="form-control" value="{{user.creditcard.expire_year}}/{{user.creditcard.expire_month}}"  readonly /> 
+                        </div>
+                    </div>
+                    <div ng-show="user.creditcard == null">
+                        <div class="form-group">
+                            No payment method added yet.
+                        </div>
+                    </div>
+                    <div class="margin-top-10">
+                        <button class="btn green-haze" ng-click="addPaymentMethod()">Add/Update payment method </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
 </div>
