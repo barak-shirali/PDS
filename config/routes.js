@@ -59,6 +59,7 @@ exports.init = function(app, passport, auth) {
     app.post    ('/bam/users', auth.isAdmin, bam.users_create);
     app.put     ('/bam/users/:id', auth.isAdmin, bam.users_update);
     app.get     ('/bam/users/:id', auth.isAdmin, bam.users_get);
+    app.delete  ('/bam/users/:id', auth.isAdmin, bam.users_delete);
     app.get     ('/bam/payments', auth.requiresLogin, bam.payments_index);
     app.get     ('/bam/payments/:id', auth.requiresLogin, bam.payments_get);
     app.get     ('/bam/payments/braintree/token', auth.requiresLogin, bam.payments_braintree_token);

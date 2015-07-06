@@ -10,7 +10,7 @@ var braintree = require('../lib/braintree');
 var paypal = require('../../config/paypal');
 
 exports.users_index = function(req, res) {
-	db.User.findAll({status: {ne: 'DELETED'}})
+	db.User.scope('not_deleted').findAll()
 		.success(function(users) {
 			return res.send({
 				code: 'OK',
@@ -202,6 +202,42 @@ exports.users_get = function(req, res) {
 				code: 'OK',
 				user: user
 			});
+        }
+    }).error(function(err){
+        return res.status(400).send({
+            error: 'user not found.', 
+            code: 'INVALID_USER_ID'
+        });
+    });
+};
+
+exports.users_delete = function(req, res) {
+	db.User.find({ where: {id: req.params.id} }).success(function(user){
+        if(!user) {
+            return res.status(400).send({
+                error: 'user not found.', 
+                code: 'INVALID_USER_ID'
+            });
+        } else {
+        	user.status = 'DELETED';
+        	user.save()
+        		.success(function() {
+
+	        		db.sequelize.query('DELETE FROM UserDevices WHERE UserId = ' + user.id);
+
+					return res.send({
+						error: '',
+						code: 'OK',
+						user: user
+					});
+        		})
+        		.error(function(e) {
+					console.log(err);
+					return res.status(400).send({ 
+					  error: "Unexpected error.",
+					  code: "UNEXPECTED_ERROR"
+					});
+        		});
         }
     }).error(function(err){
         return res.status(400).send({

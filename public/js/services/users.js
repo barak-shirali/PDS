@@ -134,6 +134,19 @@ MetronicApp
 					.error(function(data, status, headers, config) {
 						callback(data.code, data.error, null);
 					});
+			},
+
+			delete: function(id, callback) {
+				$http
+					.delete('/bam/users/' + id, {
+						headers: { token: this.getCurrentToken() },
+					})
+					.success(function(data, status, headers, config) {
+						callback(data.code, data.error, null);
+					})
+					.error(function(data, status, headers, config) {
+						callback(data.code, data.error, null);
+					});
 			}
 		};
 	}]);

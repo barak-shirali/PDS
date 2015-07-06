@@ -89,18 +89,18 @@ module.exports = function(sequelize, DataTypes) {
 		{ 
 			scopes: {
 				all: { where: { } },
-				deleted: { where: { "User.status": 'DELETED' } },
-				not_deleted: { where: { "User.status": { ne: 'DELETED' } } },
-				active: { where: { "User.status": 'ACTIVE' } },
+				deleted: { where: { "Users.status": 'DELETED' } },
+				not_deleted: { where: { "Users.status": { ne: 'DELETED' } } },
+				active: { where: { "Users.status": 'ACTIVE' } },
 				any: function(status) {
 					return {
 						where: {
-							"User.status": status
+							"Users.status": status
 						}
 					};
 				},
-				drivers: { where: { "User.type" : 'DRIVER' } },
-				SRSs: { where: { "User.type" : 'SRS' } }
+				drivers: { where: { "Users.type" : 'DRIVER' } },
+				SRSs: { where: { "Users.type" : 'SRS' } }
 			},
 			instanceMethods: {
 				makeSalt: function() {

@@ -22,7 +22,7 @@ MetronicApp
                 }
             });
     }])
-    .controller('usersController', ['$rootScope', '$scope', '$state', 'currentUser', 'Users', function($rootScope, $scope, $state, currentUser, Users) {
+    .controller('usersController', ['$rootScope', '$scope', '$state', 'currentUser', 'Users', 'ngTableParams', function($rootScope, $scope, $state, currentUser, Users, ngTableParams) {
         $scope.$on('$viewContentLoaded', function() {   
             // initialize core components
             Metronic.initAjax();
@@ -44,6 +44,7 @@ MetronicApp
         $rootScope.currentUser = currentUser;
         $scope.error = '';
         $scope.msg = '';
+        $scope.users = [];
 
         $scope.reloadUsers = function() {
             $scope.error = '';
@@ -55,8 +56,19 @@ MetronicApp
                 else {
                     $scope.users = [];
                 }
+                $scope.tableParams.reload();
             });
         };
+        $scope.tableParams = new ngTableParams({
+            page: 1,
+            count: 10,
+            sorting: true
+        }, {
+            getData: function($defer, params) {
+                params.total($scope.users.length);
+                $defer.resolve($scope.users.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+            }
+        });
         $scope.getStatus = function(user) {
             if(user.status == 'UNVERIFIED') return 'Unverified';
             else if(user.status == 'ACTIVE') return 'Active';
@@ -78,12 +90,24 @@ MetronicApp
             else return 'Added';
             // }
         };
-        $scope.$on('ngRepeatFinished', function(ngRepeatFinishedEvent) {
-                TableAdvanced.init();
-                // Layout.fixContentHeight();
-        });
+        // $scope.$on('ngRepeatFinished', function(ngRepeatFinishedEvent) {
+        //         TableAdvanced.init();
+        //         // Layout.fixContentHeight();
+        // });
         $scope.delete= function(user) {
-            
+            if(!confirm('Do you want to proceed?')) return;
+
+            Users.delete(user.id, function(code, data) {
+                if(code == 'OK') {
+                    $scope.reloadUsers();
+                    $scope.error = '';
+                    $scope.msg = 'Successfully removed';
+                }
+                else {
+                    $scope.msg = '';
+                    $scope.error = error;
+                }
+            });
         };
         $scope.reloadUsers();
         Layout.fixContentHeight();

@@ -13,6 +13,8 @@ var TableAdvanced = function () {
 
             var table = $('.datatable table');
 
+            if(table.length === 0) return;
+
             /* Fixed header extension: http://datatables.net/extensions/keytable/ */
 
             var oTable = table.dataTable({
