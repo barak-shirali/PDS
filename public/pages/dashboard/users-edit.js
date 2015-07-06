@@ -54,7 +54,7 @@ MetronicApp
                         return {
                             id: null,
                             type: 'DRIVER',
-                            status: 'BLOCKED'
+                            status: 'ACTIVE'
                         };
                     }]
                 }
