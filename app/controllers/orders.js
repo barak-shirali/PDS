@@ -203,6 +203,18 @@ exports.destroy = function(req, res) {
     order.updateAttributes({
         status: 'CANCELED'
     }).success(function(a){
+        if(order.driver_id) {
+            notification.sendNotification(order.driver_id, {
+                type: 'ORDER_DELETED',
+                message: req.user.firstname + ' ' + req.user.lastname + ' has canceled the order.',
+                data: {
+                    order: order,
+                    orderId: order.id
+                }
+            }, function() {
+            });
+        }
+
         return res.jsonp({
             code: 'OK',
             error: ''
