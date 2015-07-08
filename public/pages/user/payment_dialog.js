@@ -11,7 +11,7 @@ MetronicApp
             billing_address: {
                 line1: '',
                 city: '',
-                country_code: '',
+                country_code: 'US',
                 state: '',
                 postal_code: ''
             }

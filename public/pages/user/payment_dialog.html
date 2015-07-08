@@ -83,7 +83,9 @@
 			<input type="text" class="form-control" ng-model="creditcard.billing_address.postal_code" placeholder="Postal Code" />
 		</div>
 		<div class="form-group ol-lg-6 col-md-6 col-sm-12 col-xs-12">
-			<input type="text" class="form-control" ng-model="creditcard.billing_address.country_code" placeholder="Country Code (US)" />
+			<select class="form-control" ng-model="creditcard.billing_address.country_code">
+				<option value="US">United States</option>
+			</select>
 		</div>
 	</div>
 </div>
