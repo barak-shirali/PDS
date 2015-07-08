@@ -6,10 +6,10 @@ MetronicApp
             expire_month: '',
             expire_year: '',
             cvv2: '',
-            first_name: user.firstname,
-            last_name: user.lastname,
+            first_name: '',
+            last_name: '',
             billing_address: {
-                line1: user.address,
+                line1: '',
                 city: '',
                 country_code: '',
                 state: '',
