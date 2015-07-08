@@ -70,7 +70,7 @@ MetronicApp
                 }
             });
     }])
-    .controller('usersEditController', ['$rootScope', '$scope', '$state', '$modal', 'currentUser', 'user', 'Users', function($rootScope, $scope, $state, $modal, currentUser, user, Users) {
+    .controller('usersEditController', ['$rootScope', '$scope', '$state', '$modal', 'currentUser', 'user', 'Users', 'Map', function($rootScope, $scope, $state, $modal, currentUser, user, Users, Map) {
         $scope.$on('$viewContentLoaded', function() {   
             // initialize core components
             Metronic.initAjax();
@@ -119,6 +119,15 @@ MetronicApp
             else {
                 Users.create(user, callback);
             }
+        };
+
+        $scope.findLatLng = function() {
+            Map.geocode($scope.user.address, function(geo) {
+                if(geo) {
+                    $scope.user.latitude = geo.lat;
+                    $scope.user.longitude = geo.lng;
+                }
+            }); 
         };
 
         $scope.addPaymentMethod = function() {
