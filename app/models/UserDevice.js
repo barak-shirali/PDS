@@ -15,16 +15,13 @@ module.exports = function(sequelize, DataTypes) {
 		{
 			classMethods: {
 				addDevice: function(deviceInfo) {
-					var search = {
-						UserId: deviceInfo.UserId
-					};
-					UserDevice.find({where: search})
-						.success(function(device) {
-							if(device) {
-								device.destroy();
-							}
+					sequelize.query('DELETE FROM UserDevices WHERE UserId = ' + deviceInfo.UserId)
+				        .then(function(users) {
 							UserDevice.create(deviceInfo);
-						});
+				        }, function(err) {
+				            console.log(err);
+				            next(null);
+				        });
 				}
 			},
 			associate: function(models){
