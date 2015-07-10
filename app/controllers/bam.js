@@ -81,7 +81,7 @@ exports.users_create = function(req, res) {
 
 	if(req.body.password) {
 		req.body.salt = req.user.makeSalt();
-		req.body.hashedPassword = req.user.encryptPassword(req.body.password, req.user.salt);
+		req.body.hashedPassword = req.user.encryptPassword(req.body.password, req.body.salt);
 	}
 
 	req.body.status = 'ACTIVE';
