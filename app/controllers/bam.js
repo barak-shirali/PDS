@@ -86,18 +86,28 @@ exports.users_create = function(req, res) {
 
 	req.body.status = 'ACTIVE';
 
-	db.User.create(req.body).success(function(user){
-		return res.send({
-			error: '',
-			code: 'OK',
-			user: user
-		});
-	}).error(function(err){
-		console.log(err);
-		return res.status(400).send({ 
-		  error: "Unexpected error.",
-		  code: "UNEXPECTED_ERROR"
-		});
+	db.User.scope('not_deleted').find({ where: { email: req.body.email }}).success(function(user) {
+		if(user) {
+			return res.status(400).send({ 
+				error: 'Email address already exists.',
+				code: 'INVALID_EMAIL'
+			});
+		}
+		else {
+			db.User.create(req.body).success(function(user){
+				return res.send({
+					error: '',
+					code: 'OK',
+					user: user
+				});
+			}).error(function(err){
+				console.log(err);
+				return res.status(400).send({ 
+				  error: "Unexpected error.",
+				  code: "UNEXPECTED_ERROR"
+				});
+			});
+		}
 	});
 };
 
@@ -156,37 +166,46 @@ exports.users_update = function(req, res) {
 
 	if(req.body.password) {
 		req.body.salt = req.user.makeSalt();
-		req.body.hashedPassword = req.user.encryptPassword(req.body.password, req.user.salt);
+		req.body.hashedPassword = req.user.encryptPassword(req.body.password, req.body.salt);
 	}
-
-	db.User.find({ where: {id: req.params.id} }).success(function(user){
-        if(!user) {
-            return res.status(400).send({
-                error: 'user not found.', 
-                code: 'INVALID_USER_ID'
-            });
-        } else {
-        	user.updateAttributes(req.body)
-        		.success(function(user) {
-        			return res.send({
-						error: '',
-						code: 'OK',
-						user: user
-					});
-        		}).error(function(err){
-					console.log(err);
-					return res.status(400).send({ 
-					  error: "Unexpected error.",
-					  code: "UNEXPECTED_ERROR"
-					});
-				});   
-        }
-    }).error(function(err){
-        return res.status(400).send({
-            error: 'user not found.', 
-            code: 'INVALID_USER_ID'
-        });
-    });
+	db.User.scope('not_deleted').find({ where: { email: req.body.email }}).success(function(user) {
+		if(user && user.id != req.params.id) {
+			return res.status(400).send({ 
+				error: 'Email address already exists.',
+				code: 'INVALID_EMAIL'
+			});
+		}
+		else {
+			db.User.find({ where: {id: req.params.id} }).success(function(user){
+		        if(!user) {
+		            return res.status(400).send({
+		                error: 'user not found.', 
+		                code: 'INVALID_USER_ID'
+		            });
+		        } else {
+		        	user.updateAttributes(req.body)
+		        		.success(function(user) {
+		        			return res.send({
+								error: '',
+								code: 'OK',
+								user: user
+							});
+		        		}).error(function(err){
+							console.log(err);
+							return res.status(400).send({ 
+							  error: "Unexpected error.",
+							  code: "UNEXPECTED_ERROR"
+							});
+						});   
+		        }
+		    }).error(function(err){
+		        return res.status(400).send({
+		            error: 'user not found.', 
+		            code: 'INVALID_USER_ID'
+		        });
+		    });
+		}
+	});
 };
 
 exports.users_get = function(req, res) {
