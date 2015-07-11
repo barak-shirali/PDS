@@ -85,20 +85,26 @@ exports.auth = function(req, res) {
     }
     else {
       console.log('Login (local) : { id: ' + user.id + ', email: ' + user.email + ' }');
-      var token = db.UserSession.createSession(user.id);
-      if(deviceToken) {
-        db.UserDevice.addDevice({
-          type: deviceType,
-          token: deviceToken,
-          UserId: user.id
+      db.sequelize.query('DELETE FROM UserSessions WHERE UserId = ' + user.id)
+        .then(function(users) {
+          var token = db.UserSession.createSession(user.id);
+          if(deviceToken) {
+            db.UserDevice.addDevice({
+              type: deviceType,
+              token: deviceToken,
+              UserId: user.id
+            });
+          }
+          return res.send({
+            error: '',
+            code: 'OK',
+            token: token,
+            user: user.json()
+          });
+        }, function(err) {
+            console.log(err);
         });
-      }
-      return res.send({
-        error: '',
-        code: 'OK',
-        token: token,
-        user: user.json()
-      });
+      
     }
   }).error(function(err){
     return res.status(400).send({ 
