@@ -3,6 +3,7 @@ var _ = require('lodash');
 var async = require('async');
 var config    = require('../../config/config');
 var gcm = require('node-gcm');
+var apn = require('apn');
 
 var sendGSM = function(regIds, data, next) {
 	if(regIds.length === 0) {
@@ -34,7 +35,30 @@ var sendAPN = function(tokens, data, next) {
 		next();
 		return;
 	}
+
+	var options = { 
+		cert: __dirname + '/../../config/env/apn.pem',
+		key:  __dirname + '/../../config/env/apn.pem',
+		production: false
+	};
+
+    var apnConnection = new apn.Connection(options);
+
 	console.log('---Sending APN to ' + tokens.join());
+	var i;
+	for(i =0 ; i < tokens.length; i++) {
+		var note = new apn.Notification();
+		var myDevice = new apn.Device(tokens[i]);
+
+		note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+		note.badge = 1;
+		note.sound = "ping.aiff";
+		note.alert = data.message;
+		note.payload = data;
+
+		apnConnection.pushNotification(note, myDevice);
+	}
+
 	next();
 };
 
