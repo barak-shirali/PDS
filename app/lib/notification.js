@@ -51,7 +51,7 @@ var sendAPN = function(tokens, data, next) {
 		var myDevice = new apn.Device(tokens[i]);
 
 		note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-		note.badge = 1;
+		note.badge = 0;
 		note.sound = "ping.aiff";
 		note.alert = data.message;
 		note.payload = data;
