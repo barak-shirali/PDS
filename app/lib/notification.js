@@ -37,9 +37,8 @@ var sendAPN = function(tokens, data, next) {
 	}
 
 	var options = { 
-		cert: __dirname + '/../../config/env/apn.pem',
-		key:  __dirname + '/../../config/env/apn.pem',
-		production: false
+		cert: __dirname + '/../../config/env/' + config.apn.pem,
+		key:  __dirname + '/../../config/env/' + config.apn.pem
 	};
 
     var apnConnection = new apn.Connection(options);

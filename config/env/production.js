@@ -47,5 +47,8 @@ module.exports = {
         signature: 'AXUyLV10RCoJZfQetH35RyZZ7xxYALfYJz7prILudn6sdRBR9Ily65qg',
         sandbox: true
     },
-    FEE: 10
+    FEE: 10,
+    apn: {
+        pem: 'apndist.pem'
+    }
 }
