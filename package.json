@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "MD5": "^1.2.1",
+    "apn": "^1.7.4",
     "async": "^1.0.0",
     "bower": "latest",
     "braintree": "^1.26.0",
